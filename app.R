@@ -7,6 +7,7 @@
 
 # load libraries and data ----
 
+library(MITREShiny)
 library(rgdal)
 library(broom)
 library(ggplot2)
@@ -77,7 +78,7 @@ redlining_info <- list()
 
 # UI ----
 
-ui <- navbarPage(
+ui <- MITREnavbarPage(
   "Exploring Redlining Methods",
   # explore tab ----
   tabPanel(
