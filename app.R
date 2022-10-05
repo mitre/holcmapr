@@ -1,15 +1,15 @@
-# Test Redlining Assignments
+# Exploring Redlining Mapping Methods
 # By Hannah De los Santos
 # Originated on: 10/16/2020
 
-# Note: Built as a shiny app for ease of collecting results. This also includes
-# asthma overlay, as a preliminary view.
+# Note: Built as a shiny app for ease of use by researchers and other folks.
 
 # load libraries and data ----
 
 library(MITREShiny)
 library(rhandsontable)
 library(stringr)
+library(shinyWidgets)
 
 library(rgdal)
 library(broom)
@@ -30,7 +30,8 @@ library(tigris)
 source("redlining_global_var.R", local = T)
 
 # functions to run code
-source("redlining_functions.R", local = T)
+source("redlining_map_functions.R", local = T)
+source("redlining_plot_functions.R", local = T)
 
 # we're going to load each and then cache it
 city_cache <- c()
@@ -113,20 +114,21 @@ ui <- MITREnavbarPage(
           choices = paper_avail,
           multiple = T
         ),
-        checkboxInput(
-          "add_asthma", 
-          HTML("<b>Overlay asthma prevalence (PLACES)?</b> Not recommended with mental health prevalence."),
-          value = F
+        materialSwitch(
+          "add_outcome",
+          HTML("<b>Overlay health outcome in map plots?</b>"),
+          value = F,
+          status = "primary",
         ),
-        checkboxInput(
-          "add_mental_health", 
-          HTML("<b>Overlay mental health prevalence (PLACES)?</b> Not recommended with asthma prevalence."),
-          value = F
-        ),
-        checkboxInput(
-          "lin_asthma", 
-          HTML("<b>Use asthma as the outcome in linear models?</b> Otherwise, mental health."),
-          value = T
+        selectInput(
+          "which_outcome",
+          "Which health outcome would you like to observe in overlays and linear models?",
+          choices = c(
+            "Life Expectancy" = "le",
+            "Physical Health" = "pe",
+            "Mental Health" = "mh"
+          ),
+          selected = "le"
         ),
         checkboxInput(
           "add_penalty", 
@@ -274,9 +276,8 @@ server <- function(input, output, session) {
   )
   # add places
   places_out <- reactiveValues(
-    "add_asthma" = F,
-    "add_mental_health" = F,
-    "lin_asthma" = T
+    "add_outcome" = F,
+    "which_outcome" = "le"
   )
   # penalties for holc coverage
   penalty <- reactiveValues(
@@ -344,11 +345,8 @@ server <- function(input, output, session) {
       
       in_methods(c(ms, input$paper_methods))
       
-      map_opacity$incl <- input$map_opacity
-      
-      places_out$add_asthma <- input$add_asthma
-      places_out$add_mental_health <- input$add_mental_health
-      places_out$lin_asthma <- input$lin_asthma
+      places_out$add_outcome <- input$add_outcome
+      places_out$which_outcome <- input$which_outcome
       
       penalty$add_penalty <- input$add_penalty
       penalty$pen_wt <- input$pen_wt
@@ -556,8 +554,8 @@ server <- function(input, output, session) {
           if (my_pc %in% in_methods()){
             plot_assignment(
               pretty_out$city, pretty_out$st, census$ct, my_pc, intr_df$thr,
-              add_asthma = places_out$add_asthma, 
-              add_mental_health = places_out$add_mental_health
+              add_outcome = places_out$add_outcome, 
+              which_outcome = places_out$which_outcome
             )
           } else {
             ggplot()+theme_bw()
@@ -669,33 +667,33 @@ server <- function(input, output, session) {
   # plot map differences ----
   
   # plot all the assignment methods
-  for (pc1 in methods_avail){
-    for (pc2 in methods_avail){
-      local({
-        my_pc1 <- pc1
-        my_pc2 <- pc2
-        output[[paste0("mp", "m", my_pc1, "m", my_pc2)]] <- renderPlot({
-          withProgress(message = "Plotting maps", 
-                       detail = paste(my_pc1, "-", my_pc2), {
-            if (my_pc1 %in% in_methods() & my_pc2 %in% in_methods()){
-              plot_assignment_diff(
-                pretty_out$city, pretty_out$st, census$ct, 
-                my_pc1, my_pc2, intr_df$thr
-              )
-            } else {
-              ggplot()+theme_bw()
-            }
-            
-          })
-        })
-      })
-    }
-  }
+  # for (pc1 in methods_avail){
+  #   for (pc2 in methods_avail){
+  #     local({
+  #       my_pc1 <- pc1
+  #       my_pc2 <- pc2
+  #       output[[paste0("mp", "m", my_pc1, "m", my_pc2)]] <- renderPlot({
+  #         withProgress(message = "Plotting maps", 
+  #                      detail = paste(my_pc1, "-", my_pc2), {
+  #           if (my_pc1 %in% in_methods() & my_pc2 %in% in_methods()){
+  #             plot_assignment_diff(
+  #               pretty_out$city, pretty_out$st, census$ct, 
+  #               my_pc1, my_pc2, intr_df$thr
+  #             )
+  #           } else {
+  #             ggplot()+theme_bw()
+  #           }
+  #           
+  #         })
+  #       })
+  #     })
+  #   }
+  # }
   
   # plot linear models ----
   
   # plot all the linear model methods (only some will be rendered)
-  for (pc in methods_avail){
+  for (pc in methods_avail_analysis){
       local({
         my_pc <- pc
         # linear models
@@ -704,7 +702,7 @@ server <- function(input, output, session) {
             message = "Plotting linear models", 
             detail = paste(my_pc), {
               if (my_pc %in% in_methods()){
-                plot_lin_mod(my_pc, intr_df$thr, places_out$lin_asthma)
+                plot_lin_mod(my_pc, intr_df$thr, places_out$which_outcome)
               } else {
                 ggplot()+theme_bw()
               }
@@ -718,7 +716,7 @@ server <- function(input, output, session) {
         #     message = "Creating linear model summaries", 
         #     detail = paste(my_pc), {
         #       if (my_pc %in% in_methods()){
-        #         out_lin_mod_summary(my_pc, intr_df$thr, places_out$lin_asthma)
+        #         out_lin_mod_summary(my_pc, intr_df$thr, places_out$which_outcome)
         #       } else {
         #         print("")
         #       }

@@ -337,10 +337,15 @@ cutoff_num_avail <-
     )
   )
   
-  # SROP HERE
 specific_method_map <- c(
   "prop_area_20thr" = "ncrc",
   "plurality_area_0thr" = "lane",
   "plurality_area_50thr" = "lee",
   "round_area_0thr" = "lane"
+)
+
+outcome_map <- c(
+  "Life Expectancy" = "le",
+  "Physical Health" = "pe",
+  "Mental Health" = "mh"
 )

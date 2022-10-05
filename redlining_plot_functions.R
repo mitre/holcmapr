@@ -101,7 +101,7 @@ plot_census_block_pop <- function(cb){
 
 # function to plot tracts with their assignment based on a specific method (cn)
 plot_assignment <- function(city, st, ct, cn, intr_df,
-                            add_asthma = F, add_mental_health = F){
+                            add_outcome = F, which_outcome = "le"){
   if (all(is.na(intr_df[,cn]))){
     return(ggplot()+theme_bw())
   }
@@ -121,12 +121,15 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
     intr_df$frac_graded[is.na(intr_df$frac_graded)] <- 0
   }
   
-  # if asthma or mental health, add to data
-  if (add_asthma){
-    intr_df$asthma <- places_df[intr_df$GEOID, "CASTHMA_CrudePrev"]
-  }
-  if (add_mental_health){
-    intr_df$mental_health <- places_df[intr_df$GEOID, "MHLTH_CrudePrev"]
+  # if adding a health outcome, add to the data
+  if (add_outcome){
+    intr_df$outcome <- if (which_outcome == "mh"){
+      places_df[intr_df$GEOID, "MHLTH_CrudePrev"]
+    } else if (which_outcome == "ph"){
+      places_df[intr_df$GEOID, "PHLTH_CrudePrev"]
+    } else {
+      le_df[intr_df$GEOID, "estimate"]
+    }
   }
   
   holc_sub <- holc_dat[
@@ -141,7 +144,7 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
                          all.x = T)
   
   # we want to add them as points, so we need the centroids
-  if (add_asthma | add_mental_health){
+  if (add_outcome){
     unw_centr_pt <- gCentroid(
       ct_city[,], 
       byid = T)
@@ -234,20 +237,26 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
   }
   
   # only add these on redlined points
-  if (add_asthma){
-    prev <- intr_df[!is.na(intr_df[,cn]), "asthma"]
+  if (add_outcome){
+    prev <- intr_df[!is.na(intr_df[,cn]), "outcome"]
     pt_lim <- c(floor(min(prev)), ceiling(max(prev)))
+    formal_name <- setNames(names(outcome_map), outcome_map)[which_outcome]
+    
+    data_df <- intr_df[!is.na(intr_df[,cn]),]
+    if (add_opacity){
+      data_df <- data_df[intr_df[!is.na(intr_df[,cn]),"frac_graded"] != 0, ]
+    }
     
     p <- p +
       geom_point(
         data = intr_df[!is.na(intr_df[,cn]),], 
         aes(unw_centroid_long, unw_centroid_lat,
-            size = asthma, color = asthma)
+            size = outcome, color = outcome)
       )+
-      scale_size_continuous("Asthma",
+      scale_size_continuous(formal_name,
                             limits = pt_lim,
                             range = c(1,7))+
-      scale_color_gradient("Asthma",
+      scale_color_gradient(formal_name,
                            limits = pt_lim,
                            low = "#FFFFFF",
                            high = "purple",
@@ -262,63 +271,24 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
     }
     
     if (!add_opacity){
-      asthma_cor <- signif(cor(
+      outcome_cor <- signif(cor(
         cor_val[!is.na(cor_val)], 
-        intr_df[!is.na(intr_df[,cn]), "asthma"], 
+        intr_df[!is.na(intr_df[,cn]), "outcome"], 
         use = "complete.obs"
       ),4)
     } else {
-      asthma_cor <- signif(cov.wt(
-        data.frame(
-          cor_val[!is.na(cor_val)], 
-          intr_df[!is.na(intr_df[,cn]), "asthma"]
-        ),
-        wt = intr_df[!is.na(intr_df[,cn]),"frac_graded"],
-        cor = T,
-      )$cor[1,2], 4)
-    }
-  }
-  
-  if (add_mental_health){
-    prev <- intr_df[!is.na(intr_df[,cn]), "mental_health"]
-    pt_lim <- c(floor(min(prev)), ceiling(max(prev)))
-    
-    p <- p +
-      geom_point(
-        data = intr_df[!is.na(intr_df[,cn]),], 
-        aes(unw_centroid_long, unw_centroid_lat,
-            size = mental_health, color = mental_health)
-      )+
-      scale_size_continuous("Mental Health",
-                            limits = pt_lim,
-                            range = c(1,7))+
-      scale_color_gradient("Mental Health",
-                           limits = pt_lim,
-                           low = "#FFFFFF",
-                           high = "blue",
-                           na.value = NA
-      )+
-      guides(color=guide_legend(), size = guide_legend())
-    
-    cor_val <- if (is.character(intr_df[,cn])){
-      holc_points[intr_df[,cn]]
-    } else {
-      intr_df[,cn]
-    }
-    
-    if (!add_opacity){
-      mental_health_cor <- signif(cor(
+      cov_df <- data.frame(
+        intr_df$GEOID[!is.na(intr_df[,cn])],
         cor_val[!is.na(cor_val)], 
-        intr_df[!is.na(intr_df[,cn]), "mental_health"], 
-        use = "complete.obs"
-      ), 4)
-    } else {
-      mental_health_cor <- signif(cov.wt(
-        data.frame(
-          cor_val[!is.na(cor_val)], 
-          intr_df[!is.na(intr_df[,cn]), "mental_health"]
-        ),
-        wt = intr_df[!is.na(intr_df[,cn]),"frac_graded"],
+        intr_df[!is.na(intr_df[,cn]), "outcome"]
+      )
+      cov_df <- cov_df[complete.cases(cov_df),]
+      cov_wts <- intr_df[intr_df$GEOID %in% cov_df[,1],"frac_graded"]
+      cov_df <- cov_df[,-1]
+      
+      outcome_cor <- signif(cov.wt(
+        cov_df,
+        wt = cov_wts,
         cor = T,
       )$cor[1,2], 4)
     }
@@ -329,10 +299,8 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
   p <- p +
     ggtitle(methods_abbrev_analysis[cn],
             subtitle = paste(
-              ifelse(add_asthma, paste0("Asthma Cor.: ", asthma_cor), ""),
-              ifelse(add_mental_health, 
-                     paste0("Mental Health Cor.: ", mental_health_cor),
-                     "")
+              ifelse(add_outcome, paste0(formal_name,
+                                         " Correlation: ", outcome_cor), "")
             ))
   
   return(p)
@@ -734,14 +702,31 @@ plot_assignment_diff <- function(city, st, ct, cn1, cn2, intr_df){
 }
 
 # function to compute and plot a linear model for a given method
-plot_lin_mod <- function(cn, intr_df, lin_asthma = T, add_weights = F){
+# inputs:
+#   cn: method to plot linear model for
+#   intr_df: data frame with all methods of interest and associated census tract
+#     values
+#   which_outcome: character for health outcome of interest, "le" (life 
+#    expectancy), "mh" (mental health), or "ph" (physical health)
+plot_lin_mod <- function(cn, intr_df, which_outcome = "le"){
+  # figure out if weights are used in the method
+  add_weights <- grepl("_wt", cn)
+  
+  # map outcome to function values
+  outcome_to_lm <- c(
+    "le" = "life expectancy",
+    "mh" = "mental health",
+    "ph" = "physical health"
+  )
+  outcome_to_title <- c(
+    "le" = "Life Expectancy (years)",
+    "mh" = "Mental Health Prevalence (%)",
+    "ph" = "Physical Health Prevalence (%)"
+  )
   
   # create annotation data frame for R sq note
-  l_mod <- if (lin_asthma){
-    run_lm(cn, intr_df, outcome = "asthma", add_weights = add_weights)
-  } else {
-    run_lm(cn, intr_df, outcome = "mental health", add_weights = add_weights)
-  }
+  l_mod <- run_lm(cn, intr_df, outcome = outcome_to_lm[which_outcome],
+                  add_weights = add_weights)
   lsum <- l_mod$lsum
   ldf <- l_mod$ldf
   
@@ -773,7 +758,7 @@ plot_lin_mod <- function(cn, intr_df, lin_asthma = T, add_weights = F){
                           limits = c(1,4),
                           na.value = "transparent")+
     theme_bw()+
-    ylab(ifelse(lin_asthma, "Asthma Prevalence", "Mental Health Prevalence"))+
+    ylab(outcome_to_title[which_outcome])+
     xlab("HOLC Grade")+
     ggtitle(paste0(methods_abbrev[cn]))+
     theme(legend.position = "bottom",
@@ -783,15 +768,21 @@ plot_lin_mod <- function(cn, intr_df, lin_asthma = T, add_weights = F){
 }
 
 # function to compute and return linear model summary for a given method
-out_lin_mod_summary <- function(cn, intr_df, lin_asthma = T){
+# inputs:
+#   cn: method to plot linear model for
+#   intr_df: data frame with all methods of interest and associated census tract
+#     values
+#   which_outcome: character for health outcome of interest, "le" (life 
+#    expectancy), "mh" (mental health), or "ph" (physical health)
+out_lin_mod_summary <- function(cn, intr_df, which_outcome = "le"){
   # add the outcome to the dataframe
-  # if asthma or mental health, add to data
-  intr_df$outcome <- 
-    if (lin_asthma){
-      places_df[intr_df$GEOID, "CASTHMA_CrudePrev"]
-    } else {
-      places_df[intr_df$GEOID, "MHLTH_CrudePrev"]
-    }
+  intr_df$outcome <- if (which_outcome == "mh"){
+    places_df[intr_df$GEOID, "MHLTH_CrudePrev"]
+  } else if (which_outcome == "ph"){
+    places_df[intr_df$GEOID, "PHLTH_CrudePrev"]
+  } else {
+    le_df[intr_df$GEOID, "estimate"]
+  }
   
   # first, get the variable
   m_res <- intr_df[,cn]
