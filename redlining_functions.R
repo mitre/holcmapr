@@ -102,16 +102,12 @@ plot_census_block_pop <- function(cb){
 
 # function to plot tracts with their assignment based on a specific method (cn)
 plot_assignment <- function(city, st, ct, cn, intr_df,
-                            add_opacity = F,
                             add_asthma = F, add_mental_health = F){
   if (all(is.na(intr_df[,cn]))){
     return(ggplot()+theme_bw())
   }
   
-  if (cn %in% c("w_centroid", "unw_centroid", "crossney", "krieger", "ncrc",
-                "li", "lynch")){
-    add_opacity <- F
-  }
+  add_opacity <- grepl("_wt", cn)
   
   # add opacity depending on the amount graded
   if (add_opacity){
@@ -332,7 +328,7 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
   
   # add the correct subtitle
   p <- p +
-    ggtitle(methods_abbrev[cn],
+    ggtitle(methods_abbrev_analysis[cn],
             subtitle = paste(
               ifelse(add_asthma, paste0("Asthma Cor.: ", asthma_cor), ""),
               ifelse(add_mental_health, 
@@ -1186,13 +1182,13 @@ test_assignment <- function(city, st, ct, cb,
       intr_df$total_area - sum_graded_area
     
     # first compute weighted score, relative to actual score (ignoring uncategorized)
-    if ("prop_area" %in% in_methods){
+    if (any(grepl("prop_area", in_methods))){
       intr_df$prop_area <-
         rowSums(sweep(intr_df[,paste0(names(holc_points), "_area")], MARGIN = 2, holc_points, `*`))/sum_graded_area
     }
     
     # then compute weighted score, w/uncategorized (avg)
-    if ("weighted_score_w_not_gr" %in% in_methods){
+    if (any(grepl("weighted_score_w_not_gr", in_methods))){
       holc_points_w_not_graded <- c(holc_points,2.5)
       names(holc_points_w_not_graded) <- c(names(holc_points), "not_graded")
       
@@ -1206,7 +1202,7 @@ test_assignment <- function(city, st, ct, cb,
     }
     
     # then compute score winner takes all (ignoring uncategorized)
-    if ("plurality_area" %in% in_methods){
+    if (any(grepl("plurality_area", in_methods))){
       intr_df$plurality_area <- 
         names(holc_points)[
           apply(intr_df[,paste0(names(holc_points), "_area")], 1, which.max)
@@ -1214,7 +1210,7 @@ test_assignment <- function(city, st, ct, cb,
     }
     
     # compute rounding proportion of area
-    if ("round_area" %in% in_methods){
+    if (any(grepl("round_area", in_methods))){
       intr_df$round_area <-
         round(rowSums(sweep(intr_df[,paste0(names(holc_points), "_area")], MARGIN = 2, holc_points, `*`))/sum_graded_area)
       
@@ -1343,12 +1339,12 @@ test_assignment <- function(city, st, ct, cb,
       
       # first compute weighted score, relative to actual score 
       # (ignoring uncategorized)
-      if ("prop_pop" %in% in_methods){
+      if (any(grepl("prop_pop", in_methods))){
         intr_df$prop_pop <-
           rowSums(sweep(intr_df[,paste0(names(holc_points), "_pop")], MARGIN = 2, holc_points, `*`))/sum_graded_pop
       }
       
-      if ("weighted_score_w_not_gr_pop" %in% in_methods){
+      if (any(grepl("weighted_score_w_not_gr_pop", in_methods))){
         # then compute weighted score, w/uncategorized (avg)
         holc_points_w_not_graded <- c(holc_points,2.5)
         names(holc_points_w_not_graded) <- c(names(holc_points), "not_graded")
@@ -1362,7 +1358,7 @@ test_assignment <- function(city, st, ct, cb,
           intr_df$total_pop
       }
       
-      if ("plurality_pop" %in% in_methods){
+      if (any(grepl("plurality_pop", in_methods))){
         # then compute score winner takes all (ignoring uncategorized)
         intr_df$plurality_pop <-
           names(holc_points)[
@@ -1371,7 +1367,7 @@ test_assignment <- function(city, st, ct, cb,
       }
       
       # compute rounding proportion of area
-      if ("round_pop" %in% in_methods){
+      if (any(grepl("round_pop", in_methods))){
         intr_df$round_pop <-
           round(rowSums(sweep(intr_df[,paste0(names(holc_points), "_pop")], MARGIN = 2, holc_points, `*`))/sum_graded_pop)
         
@@ -1393,37 +1389,32 @@ test_assignment <- function(city, st, ct, cb,
 }
 
 # function to threshold non-centroid measures
-add_threshold <- function(intr_df, thr_area = .2, thr_pop = thr_area){
+# intr_df: df with all the base methods
+# in_methods: methods that we want to calculate thresholds for, thresholds in
+#   name of method (name is in format type_contribution_amtcutoff)
+add_threshold <- function(intr_df, in_methods){
   # calculate the amount of area/population graded
   sum_graded_area <- intr_df$total_area - intr_df$not_graded_area
   sum_graded_pop <- intr_df$total_pop - intr_df$not_graded_pop
   
-  # threshold area
-  avail_area <- c("prop_area",
-                  "weighted_score_w_not_gr", 
-                  "plurality_area",
-                  "round_area") %in% colnames(intr_df)
-  if (any(avail_area)){
-    intr_df[sum_graded_area/intr_df$total_area < thr_area, 
-            c("prop_area",
-              "weighted_score_w_not_gr", 
-              "plurality_area",
-              "round_area")[avail_area]] <- NA
-  }
-  
-  # threshold population (avoiding division by 0)
-  avail_pop <- c("prop_pop",
-                 "weighted_score_w_not_gr_pop", 
-                 "plurality_pop",
-                 "round_pop") %in% colnames(intr_df)
-  if (any(avail_pop)){
-    pop_sub <- intr_df$total_pop != 0
-    intr_df[pop_sub,][
-      sum_graded_pop[pop_sub]/intr_df$total_pop[pop_sub] < thr_pop, 
-      c("prop_pop",
-        "weighted_score_w_not_gr_pop", 
-        "plurality_pop",
-        "round_pop")[avail_pop]] <- NA
+  ms <- in_methods[grepl("thr", in_methods)]
+  if (length(ms) > 0){
+    for (m in ms){
+      spl_name <- strsplit(m, "_")[[1]]
+      
+      # add base amount
+      intr_df[, m] <-  intr_df[,paste(spl_name[1:2], collapse = "_")]
+      
+      thr_amt <- as.numeric(gsub("thr","", spl_name[3]))/100
+      if (grepl("area", m)){
+        intr_df[sum_graded_area/intr_df$total_area < thr_amt, m] <- NA
+      } else {
+        # population
+        pop_sub <- intr_df$total_pop != 0
+        intr_df[pop_sub,][
+          sum_graded_pop[pop_sub]/intr_df$total_pop[pop_sub] < thr_amt, m] <- NA
+      }
+    }
   }
   
   return(intr_df)

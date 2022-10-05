@@ -8,6 +8,9 @@
 # load libraries and data ----
 
 library(MITREShiny)
+library(rhandsontable)
+library(stringr)
+
 library(rgdal)
 library(broom)
 library(ggplot2)
@@ -33,6 +36,15 @@ source("redlining_functions.R", local = T)
 city_cache <- c()
 redlining_info <- list()
 
+# preallocate the base methods data frame for input
+methods_df <- data.frame(
+  Type = c("Proportion of", "Centroid"), 
+  Contribution = c("Area", "Population"), 
+  Cutoff = c("Threshold", "Centroid"), 
+  Cutoff.Amount = c("20%", "N/A"),
+  stringsAsFactors = F
+)
+
 # testing ----
 # pretty_out <- list()
 # pretty_out$city <- city <- "Savannah"
@@ -45,13 +57,13 @@ redlining_info <- list()
 # ct <- redlining_city$ct
 # cb <- redlining_city$cb
 # 
-# in_methods <- function(){return(c("unw_centroid", "w_centroid", "prop_area","krieger","plurality_area"))}
+# in_methods <- function(){return(c("unw_centroid", "w_centroid", "prop_area_20thr","krieger","plurality_area_10thr"))}
 # c_area_pop <- redlining_city$c_area_pop
 # 
 # intr_df <- intr_df_orig <-  test_assignment(city, st, ct, cb,
 #                                             in_methods = in_methods(), c_area_pop)
 # 
-# thr_intr_df <- add_threshold(intr_df_orig, thr_area = .2)
+# thr_intr_df <- add_threshold(intr_df_orig, in_methods())
 # 
 # 
 # start <- Sys.time()
@@ -86,26 +98,21 @@ ui <- MITREnavbarPage(
     sidebarLayout(
       # sidebar with choices ----
       sidebarPanel(
-        width = 3,
+        width = 4,
         selectInput(
           "city_state", 
           "Choose the city you want to visualize:",
           choices = unique(paste0(holc_dat$city,", ", holc_dat$state))
         ),
+        HTML("<p><b>Choose the mapping methods you would like to compare: </b>(Examples appear below. To add more methods, right click to add a row. For more information choosing Type, Contribution, and Cutoff, see the about page.)</p>"),
+        rHandsontableOutput("methods_tab"),
+        HTML("<p></p>"),
         selectInput(
-          "methods",
-          "Choose the redlining methods you want to compare:",
-          choices = methods_avail,
+          "paper_methods",
+          "Choose any previously published mapping methods you would like to compare:",
+          choices = paper_avail,
           multiple = T
         ),
-        checkboxInput("thr", HTML("<b>Add Threshold?</b>"), value = T),
-        checkboxInput("auto_thr", 
-                      HTML("<b>Should threshold be computed automatically?</b> Threshold will be based on area or population based on method. If false, specified threshold below will be used."), 
-                      value = F),
-        numericInput("threshold_amount", 
-                     "Threshold fraction:", 
-                     value = .2, min = 0, max = 1),
-        checkboxInput("map_opacity", HTML("<b>Show opacity in maps/add weights based on fraction graded?</b> If checked, this will not include thresholds. This only applies to the methods proportion/plurality of area/population, and will apply weight depending on area/population, respectively."), value = F),
         checkboxInput(
           "add_asthma", 
           HTML("<b>Overlay asthma prevalence (PLACES)?</b> Not recommended with mental health prevalence."),
@@ -136,12 +143,11 @@ ui <- MITREnavbarPage(
       ),
       # main panel ----
       mainPanel(
-        width = 9,
+        width = 8,
         tabsetPanel(
           tabPanel(
             "Map Comparison",
             uiOutput("city_title1"),
-            uiOutput("auto_threshold_res"),
             HTML("<center>"),
             uiOutput("assignment_plots"),
             HTML("</center>")
@@ -278,6 +284,27 @@ server <- function(input, output, session) {
     pen_wt = .5
   )
   
+  # render sidebar output ----
+  
+  output$methods_tab <- renderRHandsontable({
+    if (!is.null(input$methods_tab)) {
+      DF <- hot_to_r(input$methods_tab)
+    } else {
+      DF <- methods_df
+    }
+    
+    rhandsontable(DF, rowHeaders = NULL, overflow = "visible") %>%
+      hot_table(highlightCol = TRUE, highlightRow = TRUE) %>%
+      hot_col(col = "Type", type = "dropdown", source = names(type_avail)) %>%
+      hot_col(col = "Contribution", type = "dropdown", 
+              source = names(contribution_avail)) %>%
+      hot_col(col = "Cutoff", type = "dropdown", 
+              source = names(cutoff_avail)) %>%
+      hot_col(col = "Cutoff.Amount", type = "dropdown", 
+              source = names(cutoff_num_avail)) %>%
+      hot_context_menu(allowRowEdit = T, allowColEdit = FALSE)
+  })
+  
   # update on button press ----
   
   # watch when a new city is chosen and the button is pressed
@@ -295,7 +322,27 @@ server <- function(input, output, session) {
         pretty_out$st <- st <- "CT"
       }
       
-      in_methods(input$methods)
+      # map the methods in from table and specific papers
+      hot <- isolate(input$methods_tab)
+      m_df <- hot_to_r(hot)
+      
+      # weighting has no number
+      m_df$Cutoff.Amount[m_df$Cutoff == "Weighting"] <- "N/A"
+      
+      # convert to methods
+      ms <- paste0(
+        type_avail[m_df$Type], "_",
+        contribution_avail[m_df$Contribution], "_",
+        cutoff_num_avail[m_df$Cutoff.Amount],
+        cutoff_avail[m_df$Cutoff]
+      )
+      ms[grepl("centroid", ms) & grepl("area", ms)] <- "unw_centroid"
+      ms[grepl("centroid", ms) & grepl("pop", ms)] <- "w_centroid"
+      
+      # now, map to names the ones that match specific methods
+      ms[ms %in% names(specific_method_map)] <- specific_method_map[ms %in% names(specific_method_map)]
+      
+      in_methods(c(ms, input$paper_methods))
       
       map_opacity$incl <- input$map_opacity
       
@@ -333,39 +380,31 @@ server <- function(input, output, session) {
       
       incProgress(amount = .2, message = "Getting HOLC assignments")
       
+      # this gets the base HOLC assignments (no thresholds)
       intr_df$orig <- intr_df$thr <-
         test_assignment(
           pretty_out$city, pretty_out$st, census$ct, census$cb,
-          input$methods, c_area_pop()
+          in_methods(), c_area_pop()
         )
+      
+      print(head(intr_df$thr))
       
       incProgress(amount = .2, message = "Adding thresholds")
       
-      if (input$thr & !map_opacity$incl){
-        if (input$auto_thr){
-          thr_area <-
-            automatic_threshold(intr_df$orig, type = "area")
-          thr_pop <-
-            automatic_threshold(intr_df$orig, type = "pop")
-        } else {
-          thr_area <-
-            thr_pop <-
-            input$threshold_amount
-        }
-        
-        # save the thresholds used
-        over_thr$area <- thr_area
-        over_thr$pop <- thr_pop
-        
-        intr_df$thr <-
-          add_threshold(intr_df$orig, thr_area = thr_area, thr_pop = thr_pop)
-      } else {
-        intr_df$thr <- intr_df$orig
-        
-        # save the thresholds used
-        over_thr$area <- over_thr$pop <- 1
-      }
+      intr_df$thr <-
+        add_threshold(intr_df$orig, in_methods())
       
+      # add the weighting methods, if any -- weights are added in plotting
+      if (any(grepl("_wt", in_methods()))){
+        ms <- in_methods()[grepl("_wt", in_methods())]
+        
+        for (m in ms){
+          spl_name <- strsplit(m, "_")[[1]]
+          
+          # add base amount
+          intr_df$thr[, m] <-  intr_df$thr[,paste(spl_name[1:2], collapse = "_")]
+        }
+      }
     })
   }))
   
@@ -379,17 +418,6 @@ server <- function(input, output, session) {
     renderUI({
       HTML(paste0("<h3><center>", pretty_out$title, "</center></h3>"))
     })
-  
-  output$auto_threshold_res <- renderUI({
-    if (nrow(intr_df$thr) > 0){
-      HTML(paste0(
-        "<center>",
-        "<h4>Area Threshold: ", signif(over_thr$area,4), "</h4>",
-        "<h4>Population Threshold: ", signif(over_thr$pop,4),"</h4>",
-        "</center>"
-      ))
-    }
-  })
   
   # generate all the assignment plot UIs
   output$assignment_plots <- renderUI({
@@ -520,26 +548,17 @@ server <- function(input, output, session) {
   })
   
   # plot all the assignment methods
-  for (pc in methods_avail){
+  for (pc in methods_avail_analysis){
     local({
       my_pc <- pc
       output[[paste0("plot", my_pc)]] <- renderPlot({
         withProgress(message = "Plotting maps", detail = my_pc, {
           if (my_pc %in% in_methods()){
-            if (!map_opacity$incl){
-              plot_assignment(
-                pretty_out$city, pretty_out$st, census$ct, my_pc, intr_df$thr,
-                add_asthma = places_out$add_asthma, 
-                add_mental_health = places_out$add_mental_health
-              )
-            } else {
-              plot_assignment(
-                pretty_out$city, pretty_out$st, census$ct, my_pc, intr_df$orig,
-                add_opacity = T,
-                add_asthma = places_out$add_asthma, 
-                add_mental_health = places_out$add_mental_health
-              )
-            }
+            plot_assignment(
+              pretty_out$city, pretty_out$st, census$ct, my_pc, intr_df$thr,
+              add_asthma = places_out$add_asthma, 
+              add_mental_health = places_out$add_mental_health
+            )
           } else {
             ggplot()+theme_bw()
           }

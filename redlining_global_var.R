@@ -295,3 +295,52 @@ mixed_class <- c(
   "Not Very Mixed" = 99,
   "Not Mixed" = 100
 )
+
+# global variables, app ----
+
+paper_avail <- c(
+  "Nardone, et al.: Population weighted centroid" = "w_centroid",
+  "Crossney and Bartelt: Proportion of area, filter by people and housing units" = "crossney",
+  "NCRC: Proportion of area, 20% threshold" = "ncrc",
+  "Krieger, et al.+: Majority of area, 50% threshold" = "krieger",
+  "Wilson: Unweighted centroid" = "unw_centroid",
+  "Li and Yuan: Highest graded area, 10% threshold" = "li",
+  "Lynch, et al.: Total proportion of area, 50% threshold" = "lynch",
+  "Lane, et al.: Plurality of area, 0% threshold" = "lane",
+  "Lee, et al.: Plurality of area, 50% threshold" = "lee",
+  "Mujahid, et al.: Rounded proportion of area, 0% threshold" = "mujahid"
+)
+
+type_avail <- c(
+  "Proportion of" = "prop", 
+  "Plurality of" = "plurality", 
+  "Rounded Proportion of" = "round",
+  "Centroid" = "centroid"
+)
+
+contribution_avail <- c(
+  "Area" = "area",
+  "Population" = "pop"
+)
+
+cutoff_avail <- c(
+  "Threshold" = "thr",
+  "Weighting" = "wt",
+  "Centroid" = ""
+)
+
+cutoff_num_avail <-
+  setNames(
+    c("", seq(0,50, by = 10)),
+    c("N/A",
+      paste0(seq(0,50, by = 10), "%")
+    )
+  )
+  
+  # SROP HERE
+specific_method_map <- c(
+  "prop_area_20thr" = "ncrc",
+  "plurality_area_0thr" = "lane",
+  "plurality_area_50thr" = "lee",
+  "round_area_0thr" = "lane"
+)
