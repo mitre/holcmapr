@@ -11,6 +11,7 @@ library(rhandsontable)
 library(stringr)
 library(shinyWidgets)
 
+library(broom)
 library(rgdal)
 library(ggplot2)
 library(raster)

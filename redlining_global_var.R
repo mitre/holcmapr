@@ -15,7 +15,6 @@ library(shiny)
 library(reshape2)
 library(grid)
 library(gridExtra)
-library(colorspace)
 library(tigris)
 library(scales)
 
