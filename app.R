@@ -141,7 +141,8 @@ ui <- MITREnavbarPage(
           value = .5, 
           step = .1,
           min = 0),
-        actionButton("upd", "Update!")
+        actionButton("upd", "Update!"),
+        downloadButton("download_dat", "Download Mapping Data (.csv)")
       ),
       # main panel ----
       mainPanel(
@@ -305,6 +306,17 @@ server <- function(input, output, session) {
               source = names(cutoff_num_avail)) %>%
       hot_context_menu(allowRowEdit = T, allowColEdit = FALSE)
   })
+  
+  output$download_dat <- downloadHandler(
+    filename = function() {
+      paste0("Redlining_Map_Results_", pretty_out$city, "_", pretty_out$st, "_",
+             Sys.Date(), ".csv")
+    },
+    content = function(file) {
+      print("hi")
+      write.csv(intr_df$thr, file, row.names = FALSE)
+    }
+  )
   
   # update on button press ----
   
