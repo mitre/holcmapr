@@ -1,0 +1,20 @@
+Package: holcmapr
+Title: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) 
+  Redlining Maps
+Version: 0.0.1
+Authors@R: c(
+    person("Hannah", "De los Santos", 
+           email = "hdelossantos@mitre.org", 
+           role = c("aut", "cre")),
+    person("Carla", "Bezold", role = c("aut")),
+    person("Karen", "Jiang", role = c("aut")),
+    person("Jarvis", "Chen", role = c("aut")),
+    person("Cassandra", "Okechukwu", role = c("aut"))
+    )
+Description: Provides a Shiny application implementing and comparing methods of 
+  mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to 
+  present-day census tracts for all redlined cities.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.1
