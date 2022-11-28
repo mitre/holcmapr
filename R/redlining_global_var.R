@@ -1,41 +1,24 @@
-# Global Redlining Information (methods, etc.)
+# Global Redlining Information (methods names, etc.) -- READ ONLY
 # By Hannah De los Santos
 # Originated on: 6/24/21
-
-# load libraries ----
-
-library(rgdal)
-library(broom)
-library(ggplot2)
-library(raster)
-library(rgeos)
-library(tidycensus)
-library(sf)
-library(shiny)
-library(reshape2)
-library(grid)
-library(gridExtra)
-library(tigris)
-library(scales)
 
 # load global data ----
 
 data_folder <- data_folder <- file.path(
-  gsub("\\\\","/", gsub("OneDrive - ","", Sys.getenv("OneDrive"))), 
+  gsub("\\\\","/", gsub("OneDrive - ","", Sys.getenv("OneDrive"))),
   "Health Equity MIP - Redlining Data")
 
 # load HOLC data -- much faster to load it from RData
 # holc_dat <- readOGR(
 #   file.path(data_folder, "Redlining", "redlining_fullshpfile", "HOLC_Cities.gdb"),
 #   "holc_ad_data")
-load(file.path(data_folder, "Redlining", "HOLC_shpfile.RData")) 
+load(file.path(data_folder, "Redlining", "HOLC_shpfile.RData"))
 # will result in holc_dat
 
 # load us cities data (for mapping to counties for easy census download)
 us_cities <- read.csv(file.path(data_folder, "US_cities.csv"))
 # also load specific city mappings
 specific_us_cities <- read.csv(file.path(data_folder, "Specific_US_cities.csv"))
-
 
 # load centroids
 centr_pop <- read.csv(
@@ -147,7 +130,7 @@ methods_avail_analysis <- c(
   "Lane, et al.: Plurality of area, 0% threshold" = "lane",
   "Lee, et al.: Plurality of area, 50% threshold" = "lee",
   "Mujahid, et al.: Rounded proportion of area, 0% threshold" = "mujahid",
-  
+
   # extensions (no duplicates of methods) ---
  "Proportion of area, 0% threshold" = "prop_area_0thr",
  "Proportion of population, 0% threshold" = "prop_pop_0thr",
@@ -162,7 +145,7 @@ methods_avail_analysis <- c(
  "Proportion of population, 50% threshold" = "prop_pop_50thr",
  "Proportion of area, weighted" = "prop_area_wt",
  "Proportion of population, weighted" = "prop_pop_wt",
- 
+
  "Plurality of population rules, 0% threshold" = "plurality_pop_0thr",
  "Plurality of area rules, 10% threshold" = "plurality_area_10thr",
  "Plurality of population rules, 10% threshold" = "plurality_pop_10thr",
@@ -175,7 +158,7 @@ methods_avail_analysis <- c(
  "Plurality of population rules, 50% threshold" = "plurality_pop_50thr",
  "Plurality of area rules, weighted" = "plurality_area_wt",
  "Plurality of population rules, weighted" = "plurality_pop_wt",
- 
+
  "Rounded proportion of population, 0% threshold" = "round_pop_0thr",
  "Rounded proportion of area, 10% threshold" = "round_area_10thr",
  "Rounded proportion of population, 10% threshold" = "round_pop_10thr",
@@ -203,7 +186,7 @@ methods_abbrev_analysis <- c(
   "Lane, et al.: Plurality area, 0% thr." = "lane",
   "Lee, et al.: Plurality area, 50% thr." = "lee",
   "Mujahid, et al.: Round prop. area, 0% thr." = "mujahid",
-  
+
   # extensions (no duplicates of methods) ---
   "Prop. area, 0% thr." = "prop_area_0thr",
   "Prop. pop., 0% thr." = "prop_pop_0thr",
@@ -218,7 +201,7 @@ methods_abbrev_analysis <- c(
   "Prop. pop., 50% thr." = "prop_pop_50thr",
   "Prop. area, weighted" = "prop_area_wt",
   "Prop. pop., weighted" = "prop_pop_wt",
-  
+
   "Plurality area, 0% thr." = "plurality_area_0thr",
   "Plurality pop., 0% thr." = "plurality_pop_0thr",
   "Plurality area, 10% thr." = "plurality_area_10thr",
@@ -232,7 +215,7 @@ methods_abbrev_analysis <- c(
   "Plurality pop., 50% thr." = "plurality_pop_50thr",
   "Plurality area, weighted" = "plurality_area_wt",
   "Plurality pop., weighted" = "plurality_pop_wt",
-  
+
   "Round prop. pop., 0% thr." = "round_pop_0thr",
   "Round prop. area, 10% thr." = "round_area_10thr",
   "Round prop. pop., 10% thr." = "round_pop_10thr",
@@ -247,7 +230,7 @@ methods_abbrev_analysis <- c(
   "Round prop. area, weighted" = "round_area_wt",
   "Round prop. pop., weighted" = "round_pop_wt"
 )
-methods_abbrev_analysis <- 
+methods_abbrev_analysis <-
   setNames(names(methods_abbrev_analysis), methods_abbrev_analysis)
 
 # continuous v discrete
@@ -311,8 +294,8 @@ paper_avail <- c(
 )
 
 type_avail <- c(
-  "Proportion of" = "prop", 
-  "Plurality of" = "plurality", 
+  "Proportion of" = "prop",
+  "Plurality of" = "plurality",
   "Rounded Proportion of" = "round",
   "Centroid" = "centroid"
 )
@@ -335,7 +318,7 @@ cutoff_num_avail <-
       paste0(seq(0,50, by = 10), "%")
     )
   )
-  
+
 specific_method_map <- c(
   "prop_area_20thr" = "ncrc",
   "plurality_area_0thr" = "lane",
