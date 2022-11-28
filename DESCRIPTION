@@ -9,7 +9,9 @@ Authors@R: c(
     person("Carla", "Bezold", role = c("aut")),
     person("Karen", "Jiang", role = c("aut")),
     person("Jarvis", "Chen", role = c("aut")),
-    person("Cassandra", "Okechukwu", role = c("aut"))
+    person("Cassandra", "Okechukwu", role = c("aut")),
+    person("Mapping Inequality", 
+    comment = "https://dsl.richmond.edu/panorama/redlining/", role = "dtc")
     )
 Description: Provides a Shiny application implementing and comparing methods of 
   mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to 

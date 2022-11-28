@@ -1,0 +1,21 @@
+citHeader("To cite holcmapr in publications use both citations:")
+
+
+citEntry(
+  entry    = "Article",
+  title    = "holcmapr: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) Redlining Maps",
+  author   = "Hannah De los Santos, Carla Bezold, Karen Jiang, Jarvis Chen, Cassandra Okechukwu",
+  year     = 2022
+)
+
+citEntry(
+  entry    = "Article",
+  title    = "Mapping Inequality",
+  author   = "Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al.",
+  journal  = "American Panorama, ed. Robert K. Nelson and Edward L. Ayers",
+  year     = 2022,
+  url      = "https://dsl.richmond.edu/panorama/redlining/",
+  textVersion = paste(
+"Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L. Ayers, accessed November 28, 2022, https://dsl.richmond.edu/panorama/redlining/"
+  )
+)
