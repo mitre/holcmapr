@@ -12,7 +12,6 @@ library(stringr)
 library(shinyWidgets)
 
 library(rgdal)
-library(broom)
 library(ggplot2)
 library(raster)
 library(rgeos)
@@ -22,8 +21,6 @@ library(shiny)
 library(reshape2)
 library(grid)
 library(gridExtra)
-library(colorspace)
-library(mapproj)
 library(tigris)
 
 # load all global variables + data
