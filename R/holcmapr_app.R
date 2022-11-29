@@ -97,20 +97,6 @@ run_holcmapr_app <- function(){
               HTML("</center>")
             ),
             tabPanel(
-              "HOLC Grade Correlation",
-              uiOutput("city_title2"),
-              fluidRow(
-                column(
-                  width = 4,
-                  plotOutput("all_m_holc_corr", height = 500)
-                ),
-                column(
-                  width = 8,
-                  plotOutput("m_holc_scatter", height = 800)
-                )
-              )
-            ),
-            tabPanel(
               "HOLC Area/Population Distributions",
               uiOutput("city_title3"),
               fluidRow(
@@ -137,17 +123,7 @@ run_holcmapr_app <- function(){
             tabPanel(
               "HOLC Grade Coverage",
               uiOutput("city_title4"),
-              plotOutput("holc_coverage_curr_methods"),
-              plotOutput("holc_coverage_thr_area"),
-              plotOutput("holc_coverage_thr_pop")
-            ),
-            tabPanel(
-              "Map Differences",
-              uiOutput("city_title5"),
-              HTML("<center>"),
-              HTML("Plots below show mapped differences between the selected methods, M1 and M2. White tracts indicate where both methods did not assign a grade; grey indicates no difference between the method grades; orange indicates a higher grade (more redlined) for M1; purple indicates a higher grade (more redlined) for M2. If the method did not assign a grade to a given tract while the other method did, the method without a grade was assigned a 0 value.<p>"),
-              uiOutput("map_method_diff"),
-              HTML("</center>")
+              plotOutput("holc_coverage_curr_methods")
             ),
             tabPanel(
               "Linear Models",
@@ -419,39 +395,6 @@ run_holcmapr_app <- function(){
       }
     })
 
-    # generate all the map difference plot UIs
-    output$map_method_diff <- renderUI({
-      # need at least 2 method
-      if (length(in_methods()) > 1){
-        poss <- combn(in_methods(), 2)
-        tot_plots <- ncol(poss)
-        num_row <- ceiling(tot_plots/3)
-        num_col <- 3
-
-        all_plot_names <- c(paste0("mp", "m", poss[1,], "m", poss[2,]))
-
-        plot_output_list <- lapply(1:(length(all_plot_names)), function(pc){
-          column(4, plotOutput(all_plot_names[pc], height = ht+133))
-        })
-
-        # now put all the columns in rows
-        row_list <- lapply(1:num_row, function(r){
-          if (num_col * r > length(plot_output_list)){
-            fluidRow(plot_output_list[(num_col*(r-1)+1):length(plot_output_list)])
-          } else {
-            fluidRow(plot_output_list[(num_col*(r-1)+1):(num_col*r)])
-          }
-        })
-
-        # do.call(tagList, plot_output_list)
-        fluidPage(
-          row_list
-        )
-      } else {
-        fluidPage()
-      }
-    })
-
     # generate all the linear model plot/summary UIs
     output$lin_mod_ui <- renderUI({
       tot_plots <- length(in_methods())
@@ -550,37 +493,6 @@ run_holcmapr_app <- function(){
       plot_graded_scatter(pretty_out$city, pretty_out$st, intr_df$thr, T)
     })
 
-    # we're not doing these for now
-    output$thr_scatter_methods <- renderPlot({
-      # withProgress(message = "Making threshold scatter plots", {
-      #   m_valid <- in_methods()[!grepl("centroid", in_methods())]
-      #
-      #   plist <- lapply(m_valid, function(m){
-      #     incProgress(detail = m)
-      #
-      #     plot_holc_coverage_cont_thr(
-      #       pretty_out$city, pretty_out$st,
-      #       census$ct, census$cb, intr_df$thr,
-      #       holc_pop(), m
-      #     )
-      #   })
-      # })
-      #
-      # if (length(m_valid) > 0){
-      #   grid.arrange(
-      #     grobs = plist,
-      #     nrow = 1,
-      #     top = textGrob("Percent HOLC Area/Population Covered for Various Thresholds, for Methods not Including Centroids", gp=gpar(fontface = "bold"))
-      #   )
-      # } else {
-      #   grid.arrange(
-      #     grobs = list(ggplot()+theme_bw()),
-      #     nrow = 1,
-      #     top = textGrob("Percent HOLC Area/Population Covered for Various Thresholds, for Methods not Including Centroids", gp=gpar(fontface = "bold"))
-      #   )
-      # }
-    })
-
     # plot coverage metrics ----
 
     output$holc_coverage_curr_methods <- renderPlot({
@@ -593,55 +505,6 @@ run_holcmapr_app <- function(){
         )
       })
     })
-
-    output$holc_coverage_thr_area <- renderPlot({
-      withProgress(message = "Making HOLC coverage plots for thresholds based on area", {
-        plot_holc_coverage_thr(
-          pretty_out$city, pretty_out$st,
-          census$ct, census$cb, intr_df$orig, holc_pop(), in_methods(),
-          type_cover = "area",
-          penalty$add_penalty, penalty$pen_wt, add_opacity = map_opacity$incl
-        )
-      })
-    })
-
-    output$holc_coverage_thr_pop <- renderPlot({
-      withProgress(message = "Making HOLC coverage plots for thresholds based on population", {
-        plot_holc_coverage_thr(
-          pretty_out$city, pretty_out$st,
-          census$ct, census$cb, intr_df$orig, holc_pop(), in_methods(),
-          type_cover = "pop",
-          penalty$add_penalty, penalty$pen_wt, add_opacity = map_opacity$incl
-        )
-      })
-    })
-
-
-    # plot map differences ----
-
-    # plot all the assignment methods
-    # for (pc1 in methods_avail){
-    #   for (pc2 in methods_avail){
-    #     local({
-    #       my_pc1 <- pc1
-    #       my_pc2 <- pc2
-    #       output[[paste0("mp", "m", my_pc1, "m", my_pc2)]] <- renderPlot({
-    #         withProgress(message = "Plotting maps",
-    #                      detail = paste(my_pc1, "-", my_pc2), {
-    #           if (my_pc1 %in% in_methods() & my_pc2 %in% in_methods()){
-    #             plot_assignment_diff(
-    #               pretty_out$city, pretty_out$st, census$ct,
-    #               my_pc1, my_pc2, intr_df$thr
-    #             )
-    #           } else {
-    #             ggplot()+theme_bw()
-    #           }
-    #
-    #         })
-    #       })
-    #     })
-    #   }
-    # }
 
     # plot linear models ----
 
