@@ -13,7 +13,7 @@
 #' @importFrom scales rescale
 #' @importFrom sp spTransform SpatialPoints over
 #' @export
-run_holcmapr_app <- function(){
+run_holcmapr <- function(){
 
   # load data ----
 
