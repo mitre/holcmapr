@@ -30,6 +30,8 @@ run_holcmapr_app <- function(){
     stringsAsFactors = F
   )
 
+  addResourcePath("app_www", system.file("app_www", package = "holcmapr"))
+
   # UI ----
 
   ui <- MITREnavbarPage(

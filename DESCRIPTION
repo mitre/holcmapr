@@ -10,6 +10,7 @@ Authors@R: c(
     person("Karen", "Jiang", role = c("aut")),
     person("Jarvis", "Chen", role = c("aut")),
     person("Cassandra", "Okechukwu", role = c("aut")),
+    person("Sarah", "Ober", role = "ctb"),
     person("Mapping Inequality", 
     comment = "https://dsl.richmond.edu/panorama/redlining/", role = "dtc")
     )
@@ -20,3 +21,21 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
+Imports:
+  rgdal,
+  broom,
+  ggplot2,
+  raster,
+  rgeos,
+  tidycensus,
+  sf,
+  shiny,
+  reshape2,
+  grid,
+  gridExtra,
+  tigris,
+  scales,
+  rhandsontable,
+  stringr,
+  shinyWidgets,
+  sp
