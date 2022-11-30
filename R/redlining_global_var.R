@@ -10,7 +10,7 @@ data_folder <- system.file("extdata", package = "holcmapr")
 # holc_dat <- readOGR(
 #   file.path(data_folder, "Redlining", "redlining_fullshpfile", "HOLC_Cities.gdb"),
 #   "holc_ad_data")
-load(file.path(data_folder, "Redlining", "HOLC_shpfile.RData"))
+load(file.path(data_folder, "HOLC_shpfile.RData"))
 # will result in holc_dat
 
 # load us cities data (for mapping to counties for easy census download)

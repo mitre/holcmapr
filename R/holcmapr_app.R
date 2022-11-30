@@ -14,7 +14,7 @@
 #' @importFrom sp spTransform SpatialPoints over
 #' @export
 #'
-#' @example
+#' @examples
 #' if (interactive()){
 #'   run_holcmapr()
 #' }
@@ -335,8 +335,8 @@ al. 2022</a>)</p></li>
         city_load <- paste0(city, "_", st)
         if (!city_load %in% city_cache){
           load(file.path(
-            data_folder, "Redlining", "Redlining_Cities",
-            paste0("Redlining_", city_load, "_Preprocess_Info.RData")
+            data_folder, "Redlining",
+            paste0(gsub(" ", "", city_load), "_Preprocess.RData")
           ))
 
           redlining_info[[city_load]] <<- redlining_city

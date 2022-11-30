@@ -5,10 +5,12 @@
 # load data and libraries ----
 
 # load all global variables + data
-source("redlining_global_var.R", local = T)
+source(file.path(system.file("R", package = "holcmapr"),
+                 "redlining_global_var.R"), local = T)
 
 # load all the functions for going through values
-source("redlining_functions.R")
+source(file.path(system.file("R", package = "holcmapr"),
+                 "redlining_global_var.R"))
 
 # run ----
 
@@ -79,17 +81,17 @@ source("redlining_functions.R")
 #   "Bronx/NY"
 # )
 
-# also load the initial run
-load(file.path(data_folder, "Redlining_Full_Preprocess_Info.RData"))
+# # also load the initial run
+# load(file.path(data_folder, "Redlining_Full_Preprocess_Info.RData"))
 
 start <- Sys.time()
 # redlining_info <- list()
 for (cts in all_cities){
   print(paste0("[", Sys.time(), "] ", cts))
-  
+
   city <- strsplit(cts, "/")[[1]][1]
   st <- strsplit(cts, "/")[[1]][2]
-  
+
   # counties ----
   print(paste0("[", Sys.time(), "] Getting counties..."))
 
@@ -104,10 +106,10 @@ for (cts in all_cities){
   # ADD TIGRIS INFO
   tct <- get_tigris_tract_info(city, st)
   rownames(tct) <- tct$GEOID10
-  
+
   redlining_info[[cts]][["ct"]] <- cbind(
     redlining_info[[cts]][["ct"]],
-    tct[as.character(redlining_info[[cts]][["ct"]]$GEOID), 
+    tct[as.character(redlining_info[[cts]][["ct"]]$GEOID),
         c("ALAND10", "AWATER10")]
   )
 
@@ -184,7 +186,7 @@ print(paste0("Total time: ", end - start))
 
 # save ----
 
-save(list = c("redlining_info"), 
+save(list = c("redlining_info"),
      file = file.path(data_folder, "Redlining_Full_Preprocess_Info.RData"))
 
 # break up the file for easier access ----
@@ -196,10 +198,12 @@ for (cts in 1:length(redlining_info)){
   city_name <- names(redlining_info[cts])
   # rename to save as file
   city_name <- gsub("/", "_", city_name)
-  
-  save(list = c("redlining_city"), 
+  # remove spaces
+  city_name <- gsub(" ", "", city_name)
+
+  save(list = c("redlining_city"),
        file = file.path(
-         data_folder, "Redlining", "Redlining_Cities",
-         paste0("Redlining_", city_name, "_Preprocess_Info.RData")
+         data_folder, "Redlining",
+         paste0(city_name, "_Preprocess.RData")
        ))
 }

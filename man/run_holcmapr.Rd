@@ -9,3 +9,8 @@ run_holcmapr()
 \description{
 Function to run redlining mapping methodology comparison app.
 }
+\examples{
+if (interactive()){
+  run_holcmapr()
+}
+}
