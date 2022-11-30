@@ -13,6 +13,11 @@
 #' @importFrom scales rescale
 #' @importFrom sp spTransform SpatialPoints over
 #' @export
+#'
+#' @example
+#' if (interactive()){
+#'   run_holcmapr()
+#' }
 run_holcmapr <- function(){
 
   # load data ----
@@ -314,7 +319,7 @@ al. 2022</a>)</p></li>
         ms[grepl("centroid", ms) & grepl("pop", ms)] <- "w_centroid"
 
         # now, map to names the ones that match specific methods
-        ms[ms %in% names(specific_method_map)] <- specific_method_map[ms %in% names(specific_method_map)]
+        ms[ms %in% names(specific_method_map)] <- specific_method_map[names(specific_method_map) %in% ms]
 
         in_methods(c(ms, input$paper_methods))
 
