@@ -128,9 +128,9 @@ methods_avail_analysis <- c(
   "Lane, et al.: Plurality of area, 0% threshold" = "lane",
   "Lee, et al.: Plurality of area, 50% threshold" = "lee",
   "Mujahid, et al.: Rounded proportion of area, 0% threshold" = "mujahid",
+  "Linde, et al.: Proportion of area, 0% threshold" = "prop_area_0thr",
 
   # extensions (no duplicates of methods) ---
- "Proportion of area, 0% threshold" = "prop_area_0thr",
  "Proportion of population, 0% threshold" = "prop_pop_0thr",
  "Proportion of area, 10% threshold" = "prop_area_10thr",
  "Proportion of population, 10% threshold" = "prop_pop_10thr",
@@ -184,6 +184,7 @@ methods_abbrev_analysis <- c(
   "Lane, et al.: Plurality area, 0% thr." = "lane",
   "Lee, et al.: Plurality area, 50% thr." = "lee",
   "Mujahid, et al.: Round prop. area, 0% thr." = "mujahid",
+  "Linde, et al.: Prop. area, 0% thr." = "prop_area_0thr",
 
   # extensions (no duplicates of methods) ---
   "Prop. area, 0% thr." = "prop_area_0thr",
@@ -288,7 +289,8 @@ paper_avail <- c(
   "Lynch, et al.: Total proportion of area, 50% threshold" = "lynch",
   "Lane, et al.: Plurality of area, 0% threshold" = "lane",
   "Lee, et al.: Plurality of area, 50% threshold" = "lee",
-  "Mujahid, et al.: Rounded proportion of area, 0% threshold" = "mujahid"
+  "Mujahid, et al.: Rounded proportion of area, 0% threshold" = "mujahid",
+  "Linde, et al.: Prop. area, 0% thr." = "prop_area_0thr"
 )
 
 type_avail <- c(

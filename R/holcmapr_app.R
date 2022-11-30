@@ -35,7 +35,7 @@ run_holcmapr <- function(){
   # UI ----
 
   ui <- MITREnavbarPage(
-    "Exploring Redlining Methods",
+    "holcmapr: Compare Redlining Mapping Methods",
     # explore tab ----
     tabPanel(
       "Explore",
@@ -142,19 +142,62 @@ run_holcmapr <- function(){
     tabPanel(
       "About",
       fluidRow(
-        column(width = 4),
+        column(width = 2),
         column(
-          width = 4,
+          width = 8,
           h2(HTML(
-            "<center>Welcome to the Exploring Redlining Methods App!</center><p>"
+            "<center><p>Welcome to holcmapr!</center></p>"
           )),
           HTML(
-            "This app is still in development! It is a product of the MIP \"Case study for using health equity framework\".<p><p>
+            'holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners\' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href = "https://dsl.richmond.edu/panorama/redlining/" target = "_blank">Mapping Inequality website</a>.<p><p>
 
-          For any questions, comments, or suggestions, please contact the Co-PI for this project, Hannah De los Santos (<a href = 'mailto:hdelossantos@mitre.org'>hdelossantos@mitre.org</a>)."
+            <p>holcmapr compares published methods and logical extensions of
+published methods by 3 aspects: method type, contribution, and cutoff in
+the following workflow:</p>
+<div class="figure">
+<center>
+<img src="app_www/figures/fig1_flow.png" alt />
+</center>
+</div>
+<p>These can be customized for comparison for census tracts within
+holcmapr’s main application.</p>
+<p>Published methods include:</p>
+<ul>
+<li><p>Population-weighted centroids (<a href="https://pubmed.ncbi.nlm.nih.gov/31999951/">Nardone, et al.
+2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35504083/">Mitchell,
+et al. 2022</a>)</p></li>
+<li><p>Proportion of area, filtered by people and housing units (<a href="https://www.tandfonline.com/doi/abs/10.1080/10511482.2005.9521555">Crossney
+and Bartelt 2005</a>)</p></li>
+<li><p>Proportion of area, 20% threshold (<a href="https://ncrc.org/holc-health/">NCRC 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35798451/">Motairek, et al.
+2022</a>)</p></li>
+<li><p>Plurality of area, 50% threshold, remove water areas (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7287548/">Krieger, et
+al. 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/32219369/">Krieger, et
+al. 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35603845/">Wright, et
+al. 2022</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35286901/">Li and
+Yuan 2022</a>)</p></li>
+<li><p>Unweighted area centroids (<a href="https://www.tandfonline.com/doi/full/10.1080/01944363.2020.1759127">Wilson
+2020</a>, <a href="https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2791603">Erikson,
+et al. 2022</a>, <a href="https://link.springer.com/article/10.1007/s10460-022-10340-3">Shaker,
+et al. 2022</a>)</p></li>
+<li><p>Highest graded area (<a href="https://pubmed.ncbi.nlm.nih.gov/34178163/">Li and Yuan
+2020</a>)</p></li>
+<li><p>Total proportion of area, 50% threshold (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8099638/">Lynch, et
+al. 2021</a>)</p></li>
+<li><p>Plurality of area, 0% threshold (<a href="https://pubs.acs.org/doi/full/10.1021/acs.estlett.1c01012">Lane,
+et al. 2022</a>)</p></li>
+<li><p>Plurality of area, 50% threshold (<a href="https://pubmed.ncbi.nlm.nih.gov/33102679/">Lee, et al.
+2022</a>)</p></li>
+<li><p>Rounded proportion of area, 0% threshold (<a href="https://www.pnas.org/doi/abs/10.1073/pnas.2110986118">Mujahid, et
+al. 2022</a>)</p></li>
+<li><p>Proportion of area, 0% threshold (<a href="https://pubmed.ncbi.nlm.nih.gov/35639415/">Linde, et al.
+2022</a>)</p></li>
+</ul>
+
+
+          For any questions, comments, or suggestions, please contact the Principal Investigator for this project, Hannah De los Santos (<a href = "mailto:hdelossantos@mitre.org" target = "_blank">hdelossantos@mitre.org</a>).'
           )
         ),
-        column(width = 4)
+        column(width = 2)
       )
     )
   )
