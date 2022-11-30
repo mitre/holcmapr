@@ -232,7 +232,6 @@ run_holcmapr <- function(){
                Sys.Date(), ".csv")
       },
       content = function(file) {
-        print("hi")
         write.csv(intr_df$thr, file, row.names = FALSE)
       }
     )
@@ -315,8 +314,6 @@ run_holcmapr <- function(){
             pretty_out$city, pretty_out$st, census$ct, census$cb,
             in_methods(), c_area_pop()
           )
-
-        print(head(intr_df$thr))
 
         incProgress(amount = .2, message = "Adding thresholds")
 

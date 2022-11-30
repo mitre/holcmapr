@@ -1,6 +1,5 @@
 citHeader("To cite holcmapr in publications use both citations:")
 
-
 citEntry(
   entry    = "Article",
   title    = "holcmapr: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) Redlining Maps",
@@ -17,5 +16,52 @@ citEntry(
   url      = "https://dsl.richmond.edu/panorama/redlining/",
   textVersion = paste(
 "Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L. Ayers, accessed November 28, 2022, https://dsl.richmond.edu/panorama/redlining/"
+  )
+)
+
+citEntry(
+  entry    = "Misc",
+  title    = "GeoNames Postal Code Files",
+  author   = "GeoNames",
+  note     = "Accessed: 2022-11-28",
+  url      = "https://download.geonames.org/export/zip/",
+)
+
+citHeader("If using population-weighted centroid-based methods, please cite:")
+
+citEntry(
+  entry    = "Misc",
+  title    = "Centers of Population (2010)",
+  author   = "United States Census Bureau",
+  note     = "Accessed: 2022-11-28",
+  url      = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html",
+)
+
+citHeader("If using life expectancy results, please cite:")
+
+citEntry(
+  entry    = "Article",
+  title    = " U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary",
+  author   = "Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J.",
+  journal  = "Vital Health Stat",
+  volume   = 2,
+  page     = 181,
+  year     = 2018,
+  url      = "https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html,
+  textVersion = paste(
+"Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J. U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary pdf icon[PDF – 8 MB]. National Center for Health Statistics. Vital Health Stat 2(181). 2018."
+  )
+)
+
+citHeader("If using mental or physical health results, please cite:")
+
+citEntry(
+  entry    = "Misc",
+  title    = "PLACES",
+  author   = "Centers for Disease Control and Prevention",
+  note     = "Accessed: 2022-11-28",
+  url      = "https://www.cdc.gov/places",
+  textVersion = paste(
+"PLACES. Centers for Disease Control and Prevention. Accessed 2022-11-28. https://www.cdc.gov/places"
   )
 )

@@ -12,9 +12,20 @@ Authors@R: c(
     person("Cassandra", "Okechukwu", role = c("aut")),
     person("Sarah", "Ober", role = "ctb"),
     person("Mapping Inequality", 
-    comment = "https://dsl.richmond.edu/panorama/redlining/", role = "dtc")
+    comment = "https://dsl.richmond.edu/panorama/redlining/", role = "dtc"),
+    person("National Center for Health Statistics", 
+    comment = "https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html", role = "dtc"),
+    person("United States Census Bureau", 
+    comment = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html",
+    role = "dtc"),
+    person("Centers for Disease Control and Prevention", 
+    comment = "https://www.cdc.gov/places/index.html",
+    role = "dtc"),
+    person("GeoNames", 
+    comment = "https://download.geonames.org/export/zip/",
+    role = "dtc")
     )
-Description: Provides a Shiny application implementing and comparing methods of 
+Description: Provides a Shiny application for implementing and comparing methods of 
   mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to 
   present-day census tracts for all redlined cities.
 License: MIT + file LICENSE

@@ -4,9 +4,7 @@
 
 # load global data ----
 
-data_folder <- data_folder <- file.path(
-  gsub("\\\\","/", gsub("OneDrive - ","", Sys.getenv("OneDrive"))),
-  "Health Equity MIP - Redlining Data")
+data_folder <- system.file("extdata", package = "holcmapr")
 
 # load HOLC data -- much faster to load it from RData
 # holc_dat <- readOGR(
