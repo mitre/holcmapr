@@ -4,48 +4,64 @@
 
 # load global data ----
 
-data_folder <- system.file("extdata", package = "holcmapr")
+#' function for data needed to be loaded at beginning of package
+#' @importFrom utils read.csv
+#' @keywords internal
+#' @noRd
+.onLoad <- function(libname, pkgname){
+  data_folder <- system.file("extdata", package = "holcmapr")
+  assign("data_folder", data_folder, envir = topenv())
 
-# load HOLC data -- much faster to load it from RData
-# holc_dat <- readOGR(
-#   file.path(data_folder, "Redlining", "redlining_fullshpfile", "HOLC_Cities.gdb"),
-#   "holc_ad_data")
-load(file.path(data_folder, "HOLC_shpfile.RData"))
-# will result in holc_dat
+  # load HOLC data -- much faster to load it from RData
+  # holc_dat <- readOGR(
+  #   file.path(data_folder, "Redlining", "redlining_fullshpfile", "HOLC_Cities.gdb"),
+  #   "holc_ad_data")
+  load(file.path(data_folder, "HOLC_shpfile.RData"))
+  # will result in holc_dat
+  assign("holc_dat", holc_dat, envir = topenv())
 
-# load us cities data (for mapping to counties for easy census download)
-us_cities <- read.csv(file.path(data_folder, "US_cities.csv"))
-# also load specific city mappings
-specific_us_cities <- read.csv(file.path(data_folder, "Specific_US_cities.csv"))
 
-# load centroids
-centr_pop <- read.csv(
-  file.path(
-    data_folder,"CenPop2010_Means", "CenPop2010_Mean_US.csv"
-  ),
-  colClasses = c(rep("character",3), rep("numeric",3))
-)
-centr_pop$GEOID <- paste0(
-  centr_pop$STATEFP,
-  centr_pop$COUNTYFP,
-  centr_pop$TRACTCE
-)
+  # load us cities data (for mapping to counties for easy census download)
+  us_cities <- read.csv(file.path(data_folder, "US_cities.csv"))
+  # also load specific city mappings
+  specific_us_cities <- read.csv(file.path(data_folder, "Specific_US_cities.csv"))
 
-# load PLACES data (for health outcome data)
-places_df <- read.csv(
-  file.path(data_folder, "PLACES", "CT",
-            "PLACES__Census_Tract_Data__GIS_Friendly_Format___2020_release.csv"),
-  colClasses = c("TractFIPS" = "character")
-)
-rownames(places_df) <- places_df$TractFIPS
+  assign("us_cities", us_cities, envir = topenv())
+  assign("specific_us_cities", specific_us_cities, envir = topenv())
 
-# load life expectancy data
-le_df <- read.csv(
-  file.path(data_folder, "Life_Expectancy",
-            "USALEEP_Life_Expectancy.CSV"),
-  colClasses = c("Tract.ID" = "character")
-)
-rownames(le_df) <- le_df$Tract.ID
+  # load centroids
+  centr_pop <- read.csv(
+    file.path(
+      data_folder,"CenPop2010_Means", "CenPop2010_Mean_US.csv"
+    ),
+    colClasses = c(rep("character",3), rep("numeric",3))
+  )
+  centr_pop$GEOID <- paste0(
+    centr_pop$STATEFP,
+    centr_pop$COUNTYFP,
+    centr_pop$TRACTCE
+  )
+  assign("centr_pop", centr_pop, envir = topenv())
+
+  # load PLACES data (for health outcome data)
+  places_df <- read.csv(
+    file.path(data_folder, "PLACES", "CT",
+              "PLACES__Census_Tract_Data__GIS_Friendly_Format___2020_release.csv"),
+    colClasses = c("TractFIPS" = "character")
+  )
+  rownames(places_df) <- places_df$TractFIPS
+  assign("places_df", places_df, envir = topenv())
+
+  # load life expectancy data
+  le_df <- read.csv(
+    file.path(data_folder, "Life_Expectancy",
+              "USALEEP_Life_Expectancy.CSV"),
+    colClasses = c("Tract.ID" = "character")
+  )
+  rownames(le_df) <- le_df$Tract.ID
+  assign("le_df", le_df, envir = topenv())
+
+}
 
 # global variables, general ----
 
@@ -131,45 +147,45 @@ methods_avail_analysis <- c(
   "Linde, et al.: Proportion of area, 0% threshold" = "prop_area_0thr",
 
   # extensions (no duplicates of methods) ---
- "Proportion of population, 0% threshold" = "prop_pop_0thr",
- "Proportion of area, 10% threshold" = "prop_area_10thr",
- "Proportion of population, 10% threshold" = "prop_pop_10thr",
- "Proportion of population, 20% threshold" = "prop_pop_20thr",
- "Proportion of area, 30% threshold" = "prop_area_30thr",
- "Proportion of population, 30% threshold" = "prop_pop_30thr",
- "Proportion of area, 40% threshold" = "prop_area_40thr",
- "Proportion of population, 40% threshold" = "prop_pop_40thr",
- "Proportion of area, 50% threshold" = "prop_area_50thr",
- "Proportion of population, 50% threshold" = "prop_pop_50thr",
- "Proportion of area, weighted" = "prop_area_wt",
- "Proportion of population, weighted" = "prop_pop_wt",
+  "Proportion of population, 0% threshold" = "prop_pop_0thr",
+  "Proportion of area, 10% threshold" = "prop_area_10thr",
+  "Proportion of population, 10% threshold" = "prop_pop_10thr",
+  "Proportion of population, 20% threshold" = "prop_pop_20thr",
+  "Proportion of area, 30% threshold" = "prop_area_30thr",
+  "Proportion of population, 30% threshold" = "prop_pop_30thr",
+  "Proportion of area, 40% threshold" = "prop_area_40thr",
+  "Proportion of population, 40% threshold" = "prop_pop_40thr",
+  "Proportion of area, 50% threshold" = "prop_area_50thr",
+  "Proportion of population, 50% threshold" = "prop_pop_50thr",
+  "Proportion of area, weighted" = "prop_area_wt",
+  "Proportion of population, weighted" = "prop_pop_wt",
 
- "Plurality of population rules, 0% threshold" = "plurality_pop_0thr",
- "Plurality of area rules, 10% threshold" = "plurality_area_10thr",
- "Plurality of population rules, 10% threshold" = "plurality_pop_10thr",
- "Plurality of area rules, 20% threshold" = "plurality_area_20thr",
- "Plurality of population rules, 20% threshold" = "plurality_pop_20thr",
- "Plurality of area rules, 30% threshold" = "plurality_area_30thr",
- "Plurality of population rules, 30% threshold" = "plurality_pop_30thr",
- "Plurality of area rules, 40% threshold" = "plurality_area_40thr",
- "Plurality of population rules, 40% threshold" = "plurality_pop_40thr",
- "Plurality of population rules, 50% threshold" = "plurality_pop_50thr",
- "Plurality of area rules, weighted" = "plurality_area_wt",
- "Plurality of population rules, weighted" = "plurality_pop_wt",
+  "Plurality of population rules, 0% threshold" = "plurality_pop_0thr",
+  "Plurality of area rules, 10% threshold" = "plurality_area_10thr",
+  "Plurality of population rules, 10% threshold" = "plurality_pop_10thr",
+  "Plurality of area rules, 20% threshold" = "plurality_area_20thr",
+  "Plurality of population rules, 20% threshold" = "plurality_pop_20thr",
+  "Plurality of area rules, 30% threshold" = "plurality_area_30thr",
+  "Plurality of population rules, 30% threshold" = "plurality_pop_30thr",
+  "Plurality of area rules, 40% threshold" = "plurality_area_40thr",
+  "Plurality of population rules, 40% threshold" = "plurality_pop_40thr",
+  "Plurality of population rules, 50% threshold" = "plurality_pop_50thr",
+  "Plurality of area rules, weighted" = "plurality_area_wt",
+  "Plurality of population rules, weighted" = "plurality_pop_wt",
 
- "Rounded proportion of population, 0% threshold" = "round_pop_0thr",
- "Rounded proportion of area, 10% threshold" = "round_area_10thr",
- "Rounded proportion of population, 10% threshold" = "round_pop_10thr",
- "Rounded proportion of area, 20% threshold" = "round_area_20thr",
- "Rounded proportion of population, 20% threshold" = "round_pop_20thr",
- "Rounded proportion of area, 30% threshold" = "round_area_30thr",
- "Rounded proportion of population, 30% threshold" = "round_pop_30thr",
- "Rounded proportion of area, 40% threshold" = "round_area_40thr",
- "Rounded proportion of population, 40% threshold" = "round_pop_40thr",
- "Rounded proportion of area, 50% threshold" = "round_area_50thr",
- "Rounded proportion of population, 50% threshold" = "round_pop_50thr",
- "Rounded proportion of area, weighted" = "round_area_wt",
- "Rounded proportion of population, weighted" = "round_pop_wt"
+  "Rounded proportion of population, 0% threshold" = "round_pop_0thr",
+  "Rounded proportion of area, 10% threshold" = "round_area_10thr",
+  "Rounded proportion of population, 10% threshold" = "round_pop_10thr",
+  "Rounded proportion of area, 20% threshold" = "round_area_20thr",
+  "Rounded proportion of population, 20% threshold" = "round_pop_20thr",
+  "Rounded proportion of area, 30% threshold" = "round_area_30thr",
+  "Rounded proportion of population, 30% threshold" = "round_pop_30thr",
+  "Rounded proportion of area, 40% threshold" = "round_area_40thr",
+  "Rounded proportion of population, 40% threshold" = "round_pop_40thr",
+  "Rounded proportion of area, 50% threshold" = "round_area_50thr",
+  "Rounded proportion of population, 50% threshold" = "round_pop_50thr",
+  "Rounded proportion of area, weighted" = "round_area_wt",
+  "Rounded proportion of population, weighted" = "round_pop_wt"
 )
 
 methods_abbrev_analysis <- c(
@@ -331,3 +347,4 @@ outcome_map <- c(
   "Physical Health" = "pe",
   "Mental Health" = "mh"
 )
+

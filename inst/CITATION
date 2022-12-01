@@ -1,10 +1,12 @@
 citHeader("To cite holcmapr in publications use both citations:")
 
 citEntry(
-  entry    = "Article",
+  entry    = "Manual",
   title    = "holcmapr: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) Redlining Maps",
   author   = "Hannah De los Santos, Carla Bezold, Karen Jiang, Jarvis Chen, Cassandra Okechukwu",
-  year     = 2022
+  year     = 2022,
+  note = "R package version 0.0.1",
+  textVersion = "De los Santos H, Bezold C, Jiang K, Chen J, Okechukwu C (2022). holcmapr: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) Redlining Maps. R package version 0.0.1."
 )
 
 citEntry(
@@ -25,6 +27,7 @@ citEntry(
   author   = "GeoNames",
   note     = "Accessed: 2022-11-28",
   url      = "https://download.geonames.org/export/zip/",
+  textVersion = "GeoNames (2022). GeoNames Postal Code Files. Accessed: 2022-11-28. <https://download.geonames.org/export/zip/>"
 )
 
 citHeader("If using population-weighted centroid-based methods, please cite:")
@@ -35,6 +38,7 @@ citEntry(
   author   = "United States Census Bureau",
   note     = "Accessed: 2022-11-28",
   url      = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html",
+  textVersion = "United States Census Bureau (2010). Centers of Population (2010). Accessed: 2022-11-28. <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html>"
 )
 
 citHeader("If using life expectancy results, please cite:")

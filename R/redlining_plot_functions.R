@@ -467,7 +467,7 @@ plot_method_correlation <- function(intr_df, in_methods){
 plot_holc_coverage <- function(city, st, ct, cb, intr_df, holc_pop, in_methods,
                                add_penalty = T, pen_wt = .5,
                                add_opacity = F){
-  varibale <- value <- Type <- NULL
+  variable <- value <- Type <- NULL
 
   holc_cover <- data.frame(matrix(0, nrow = 2, ncol = 1+length(in_methods)))
   colnames(holc_cover) <- c("Type", in_methods)
@@ -762,7 +762,8 @@ plot_assignment_diff <- function(city, st, ct, cn1, cn2, intr_df){
 #' @keywords internal
 #' @noRd
 plot_lin_mod <- function(cn, intr_df, which_outcome = "le"){
-  m_res <- pred <- outcome <- xpos <- ypos <- hjustvar <- annotateText <- NULL
+  m_res <- pred <- outcome <- xpos <- ypos <- hjustvar <-
+    vjustvar <- annotateText <- NULL
 
   # figure out if weights are used in the method
   add_weights <- grepl("_wt", cn)
