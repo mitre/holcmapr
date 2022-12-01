@@ -8,10 +8,11 @@
 #'
 #' @import shiny broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable rgeos raster rgdal
 #' @importFrom shinyWidgets materialSwitch
-#' @importFrom grid textGrob
+#' @importFrom grid textGrob gpar
 #' @importFrom gridExtra grid.arrange
 #' @importFrom scales rescale
 #' @importFrom sp spTransform SpatialPoints over
+#' @importFrom utils combn write.csv
 #' @export
 #'
 #' @examples
@@ -165,7 +166,7 @@ the following workflow:</p>
 </center>
 </div>
 <p>These can be customized for comparison for census tracts within
-holcmapr’s main application.</p>
+holcmapr\'s main application.</p>
 <p>Published methods include:</p>
 <ul>
 <li><p>Population-weighted centroids (<a href="https://pubmed.ncbi.nlm.nih.gov/31999951/">Nardone, et al.

@@ -41,15 +41,14 @@ citHeader("If using life expectancy results, please cite:")
 
 citEntry(
   entry    = "Article",
-  title    = " U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary",
+  title    = "U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary",
   author   = "Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J.",
   journal  = "Vital Health Stat",
   volume   = 2,
   page     = 181,
   year     = 2018,
-  url      = "https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html,
-  textVersion = paste(
-"Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J. U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary pdf icon[PDF – 8 MB]. National Center for Health Statistics. Vital Health Stat 2(181). 2018."
+  url      = "https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html",
+  textVersion = paste("Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J. U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary. National Center for Health Statistics. Vital Health Stat 2(181). 2018."
   )
 )
 
