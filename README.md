@@ -1,4 +1,4 @@
-# holcmapr: An Application for Redlining Mapping Methodologies
+# holcmapr: An Application for Comparing Redlining Mapping Methodologies
 
 ## Overview
 
