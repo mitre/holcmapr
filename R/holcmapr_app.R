@@ -74,7 +74,7 @@ run_holcmapr <- function(){
             "Which health outcome would you like to observe in overlays and linear models?",
             choices = c(
               "Life Expectancy" = "le",
-              "Physical Health" = "pe",
+              "Physical Health" = "ph",
               "Mental Health" = "mh"
             ),
             selected = "le"
@@ -89,7 +89,9 @@ run_holcmapr <- function(){
             "Penalty weight (between 0 and 1):",
             value = .5,
             step = .1,
-            min = 0),
+            min = 0,
+            max = 1
+            ),
           actionButton("upd", "Update!"),
           downloadButton("download_dat", "Download Mapping Data (.csv)")
         ),
