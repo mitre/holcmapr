@@ -327,7 +327,7 @@ al. 2022</a>)</p></li>
         # filter out methods that do not exist
         ms <- ms[ms %in% unname(methods_avail_analysis)]
 
-        in_methods(c(ms, input$paper_methods))
+        in_methods(unique(c(ms, input$paper_methods)))
 
         places_out$add_outcome <- input$add_outcome
         places_out$which_outcome <- input$which_outcome
