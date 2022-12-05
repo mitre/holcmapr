@@ -6,18 +6,6 @@
 
 # overall functions ----
 
-#' function to time things
-#' @keywords internal
-#' @noRd
-timing <- function(x){
-  start <- Sys.time()
-  v <- x
-  end <- Sys.time()
-
-  print(end-start)
-  return(v)
-}
-
 #' function to get the mode of a vector
 #' @keywords internal
 #' @noRd
