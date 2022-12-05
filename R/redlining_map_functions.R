@@ -334,18 +334,6 @@ test_assignment <- function(city, st, ct, cb,
   # note: not available through tidycensus, so I'm not making them available
   # for all states -- just example states
   if ("w_centroid" %in% in_methods){
-    # load the data
-    # centr_pop <- read.csv(
-    #   file.path(
-    #     data_folder,"CenPop2010_Means", paste0("CenPop2010_Mean_",st,".csv")
-    #   ),
-    #   colClasses = c(rep("character",3), rep("numeric",3))
-    # )
-    # centr_pop$GEOID <- paste0(
-    #   centr_pop$STATEFP,
-    #   centr_pop$COUNTYFP,
-    #   centr_pop$TRACTCE
-    # )
     centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city@data$GEOID,]
 
     w_pts <- SpatialPoints(centr_pop_city[,c("LONGITUDE", "LATITUDE")],
