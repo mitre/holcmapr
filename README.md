@@ -1,92 +1,64 @@
-# Redlining Mapping Methods Comparison Application
+# holcmapr: An Application for Comparing Redlining Mapping Methodologies
 
-An app to compare redlining methods across all redlined cities.
+## Overview
 
-## Getting started
-
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
-
-## Add your files
-
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
-
-```
-cd existing_repo
-git remote add origin https://gitlab.mitre.org/health-equity-mip/redlining-comparison.git
-git branch -M main
-git push -uf origin main
-```
-
-## Integrate with your tools
-
-- [ ] [Set up project integrations](https://gitlab.mitre.org/health-equity-mip/redlining-comparison/-/settings/integrations)
-
-## Collaborate with your team
-
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Automatically merge when pipeline succeeds](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing(SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thank you to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the [Mapping Inequality website](https://dsl.richmond.edu/panorama/redlining/).
 
 ## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+To install the development version of this package from GitHub:
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+``` r
+# uncomment the next line if you don't have devtools installed
+# install.packages("devtools")
+devtools::install_github("mitre/holcmapr")
+```
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+## Comparing Redlining Mapping Methodologies
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+holcmapr compares published methods and logical extensions of published methods by 3 aspects: method type, contribution, and cutoff in the following workflow:
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+![mapping_method_flowchart](inst/app_www/figures/fig1_flow.png)
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+These can be customized for comparison for census tracts within holcmapr's main application.
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Published methods include: 
+- Population-weighted centroids ([Nardone, et al. 2020](https://pubmed.ncbi.nlm.nih.gov/31999951/), [Mitchell, et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35504083/)) 
+- Proportion of area, filtered by people and housing units ([Crossney and Bartelt 2005](https://www.tandfonline.com/doi/abs/10.1080/10511482.2005.9521555)) 
+- Proportion of area, 20% threshold ([NCRC 2020](https://ncrc.org/holc-health/), [Motairek, et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35798451/)) 
+- Plurality of area, 50% threshold, remove water areas ([Krieger, et al. 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7287548/), [Krieger, et al. 2020](https://pubmed.ncbi.nlm.nih.gov/32219369/), [Wright, et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35603845/), [Li and Yuan 2022](https://pubmed.ncbi.nlm.nih.gov/35286901/)) 
+- Unweighted area centroids ([Wilson 2020](https://www.tandfonline.com/doi/full/10.1080/01944363.2020.1759127), [Erikson, et al. 2022](https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2791603), [Shaker, et al. 2022](https://link.springer.com/article/10.1007/s10460-022-10340-3)) 
+- Highest graded area ([Li and Yuan 2020](https://pubmed.ncbi.nlm.nih.gov/34178163/)) 
+- Total proportion of area, 50% threshold ([Lynch, et al. 2021](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8099638/)) 
+- Plurality of area, 0% threshold ([Lane, et al. 2022](https://pubs.acs.org/doi/full/10.1021/acs.estlett.1c01012)) 
+- Plurality of area, 50% threshold ([Lee, et al. 2022](https://pubmed.ncbi.nlm.nih.gov/33102679/)) 
+- Rounded proportion of area, 0% threshold ([Mujahid, et al. 2022](https://www.pnas.org/doi/abs/10.1073/pnas.2110986118)) 
+- Proportion of area, 0% threshold ([Linde, et al. 2022](https://pubmed.ncbi.nlm.nih.gov/35639415/))
 
-## License
-For open source projects, say how it is licensed.
+## Usage and Features
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+holcmapr's main function is a Shiny app, which can be accessed by running the following in R:
+
+``` r
+library(holcmapr)
+
+run_holcmapr()
+```
+
+You should then see the holcmapr app below:
+
+![holcmapr_app](man/figures/holcmapr_app.png)
+
+holcmapr allows users to compare: 
+- Comparison of city boundaries to original HOLC neighborhoods, and the alignment of HOLC graded areas and populations 
+- Selected methodology mapping results 
+- HOLC neighborhood coverage by each method 
+- Univariate linear association fits by each method, including p-value and R\^2 value, for a selected health outcome (life expectancy, mental health, or physical health)
+
+The results with mapping for each method are also available for download by CSV, for use outside the application, such as research contexts.
+
+## Contact & Attribution
+
+For any questions or concerns, please contact Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org){.email}).
+
+©2021 The MITRE Corporation. ALL RIGHTS RESERVED.
