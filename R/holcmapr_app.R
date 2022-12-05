@@ -324,6 +324,9 @@ al. 2022</a>)</p></li>
         # now, map to names the ones that match specific methods
         ms[ms %in% names(specific_method_map)] <- specific_method_map[names(specific_method_map) %in% ms]
 
+        # filter out methods that do not exist
+        ms <- ms[ms %in% unname(methods_avail_analysis)]
+
         in_methods(c(ms, input$paper_methods))
 
         places_out$add_outcome <- input$add_outcome
