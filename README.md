@@ -57,8 +57,23 @@ holcmapr allows users to compare:
 
 The results with mapping for each method are also available for download by CSV, for use outside the application, such as research contexts.
 
+## Data Sources & Citation
+
+If you're using `holcmapr` or any of it's content, please cite us and let us know you're using it at opensource@mitre.org. To see citation information for `holcmapr`, enter the following in the console window:
+
+```r
+citation("holcmapr")
+```
+
+The data sources used in this package are:
+- [Mapping Inequality](https://dsl.richmond.edu/panorama/redlining/): Redlining Spatial Files
+- [GeoNames Postal Code Files](https://download.geonames.org/export/zip/): Mapping cities to counties
+- [US Census Bureau Centers of Population (2010)](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html): Population centers for census tracts, for population-weighted centroid method
+- [USALEEP Life Expectancy](https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html): Life expectancy census tract estimates
+- [CDC Places](https://www.cdc.gov/places): Mental health and physical health census tract estimates
+
 ## Contact & Attribution
 
-For any questions or concerns, please contact Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org){.email}).
+For any questions or concerns, please contact Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org)).
 
 ©2021 The MITRE Corporation. ALL RIGHTS RESERVED.
