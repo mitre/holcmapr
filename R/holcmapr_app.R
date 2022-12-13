@@ -100,35 +100,72 @@ run_holcmapr <- function(){
           width = 8,
           tabsetPanel(
             tabPanel(
+              "City Attributes",
+              HTML("<h3><center>City Attributes: How well do original HOLC neighborhoods match up with current day census boundaries?</center></h3>"),
+              uiOutput("city_title2"),
+              # add short description
+              fluidRow(
+                column(
+                  width = 4,
+                  fluidRow(plotOutput("city_overlay")),
+                  fluidRow(plotOutput("city_stats"))
+                ),
+                column(
+                  width = 8,
+                  tabsetPanel(
+                    tabPanel(
+                      "Dominant Grade Percentage",
+                      HTML("<h5><i><center><p>Dominant Grade Percentage: how much area or population does the dominant grade take up?</i></center></h5></p>"),
+                      fluidRow(
+                        column(
+                          width = 6,
+                          plotOutput("dom_perc_area", height = 300)
+                        ),
+                        column(
+                          width = 6,
+                          plotOutput("dom_perc_pop", height = 300)
+                        )
+                      ),
+                      fluidRow(
+                        column(
+                          width = 6,
+                          plotOutput("dom_perc_area_class")
+                        ),
+                        column(
+                          width = 6,
+                          plotOutput("dom_perc_pop_class")
+                        )
+                      )
+                    ),
+                    tabPanel(
+                      "Area/Population Correlation",
+                      HTML("<h5><i><center><p>Area/Population Correlation: How much does a graded area correspond to the currently graded population?</i></center></h5></p>"),
+                      hr(),
+                      fluidRow(
+                        plotOutput("graded_scatter", height = 300)
+                      ),
+                      fluidRow(
+                        column(
+                          width = 6,
+                          plotOutput("area_graded_dens", height = 300)
+                        ),
+                        column(
+                          width = 6,
+                          plotOutput("pop_graded_dens", height = 300)
+                        )
+                      ),
+
+                    )
+                  )
+                )
+              ),
+            ),
+            tabPanel(
               "Map Comparison",
               uiOutput("city_title1"),
               HTML("<center>"),
               uiOutput("assignment_plots"),
               HTML("</center>")
-            ),
-            tabPanel(
-              "HOLC Area/Population Distributions",
-              uiOutput("city_title3"),
-              fluidRow(
-                column(
-                  width = 4,
-                  plotOutput("area_graded_dens")
-                ),
-                column(
-                  width = 4,
-                  plotOutput("pop_graded_dens")
-                ),
-                column(
-                  width = 4,
-                  plotOutput("graded_scatter")
-                )
-              ),
-              fluidRow(
-                column(
-                  width = 12,
-                  plotOutput("thr_scatter_methods")
-                )
-              )
             ),
             tabPanel(
               "HOLC Grade Coverage",
@@ -254,6 +291,14 @@ al. 2022</a>)</p></li>
     penalty <- reactiveValues(
       add_penalty = T,
       pen_wt = .5
+    )
+
+    # city attributes
+    city_attr <- reactiveValues(
+      "dom_perc_area" = c(),
+      "dom_perc_pop" = c(),
+      "dom_perc_area_class" = c(),
+      "dom_perc_pop_class" = c()
     )
 
     # render sidebar output ----
@@ -385,6 +430,19 @@ al. 2022</a>)</p></li>
             intr_df$thr[, m] <-  intr_df$thr[,paste(spl_name[1:2], collapse = "_")]
           }
         }
+
+        incProgress(amount = .2, message = "Calculating city attributes")
+
+        # calculate dominant percentage values
+        dom_perc_res <- calc_dom_perc(intr_df$thr, type = "exact")
+        dom_perc_class <- calc_dom_perc(intr_df$thr, type = "class")
+
+        city_attr$dom_perc_area <- dom_perc_res$area
+        city_attr$dom_perc_pop <- dom_perc_res$pop
+        city_attr$dom_perc_area_class <- dom_perc_class$area
+        city_attr$dom_perc_pop_class <- dom_perc_class$pop
+
+        intr_df_main <<- intr_df$thr
       })
     }))
 
@@ -483,10 +541,28 @@ al. 2022</a>)</p></li>
       )
     })
 
+    # plot city attributes ----
+
+    # plot "exact" density plots
+    output$dom_perc_area <- renderPlot({
+      plot_dom_perc_dens(city_attr$dom_perc_area, "Area")
+    })
+    output$dom_perc_pop <- renderPlot({
+      plot_dom_perc_dens(city_attr$dom_perc_pop, "Population")
+    })
+
+    # plot "mixed class" bar plots
+    output$dom_perc_area_class <- renderPlot({
+      plot_dom_perc_class(city_attr$dom_perc_area_class, "Area")
+    })
+    output$dom_perc_pop_class <- renderPlot({
+      plot_dom_perc_class(city_attr$dom_perc_area_class, "Population")
+    })
+
     # plot map comparison ----
 
     # census area overlaid on HOLC grades
-    output$census_holc_overlay <- renderPlot({
+    output$census_holc_overlay <- output$city_overlay <- renderPlot({
       if (nrow(census$ct) > 0){
         plot_census_map_overlay(pretty_out$city, pretty_out$st, census$ct)
       } else {

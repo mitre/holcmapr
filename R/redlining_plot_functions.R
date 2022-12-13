@@ -863,3 +863,81 @@ out_lin_mod_summary <- function(cn, intr_df, which_outcome = "le"){
   return(summary(lin_mod))
 }
 
+# city attributes ----
+
+#' function to plot dominant percentage density
+#' @param type "Area" or "Population"
+#' @keywords internal
+#' @noRd
+plot_dom_perc_dens <- function(dom_perc_vect, type = "Area"){
+  if (length(dom_perc_vect) == 0){
+    return(ggplot()+theme_bw())
+  }
+
+  frac.m <- data.frame(
+    "dom_perc"  = dom_perc_vect,
+    "type" = type
+  )
+  col_map <- c(
+    "Area" = "#4287f5",
+    "Population" = "#f54242"
+  )
+
+  p <- ggplot(frac.m, aes(dom_perc, fill = type, color = type))+
+    geom_density(alpha = .7)+
+    theme_bw()+
+    scale_fill_manual(values = col_map)+
+    scale_color_manual(values = col_map)+
+    xlab("Dominant Grade Percentage")+
+    ggtitle(paste0("Dominant Grade Percentage: ", type))+
+    theme(plot.title = element_text(hjust = .5),
+          legend.position = "none")+
+    scale_x_continuous(expand = c(0,0))+
+    scale_y_continuous(expand = expansion(mult = c(0,.1)))
+
+  return(p)
+}
+
+#' function to plot dominant percentage class bar plot
+#' @param type "Area" or "Population"
+#' @keywords internal
+#' @noRd
+plot_dom_perc_class <- function(dom_perc_vect, type = "Area"){
+  if (length(dom_perc_vect) == 0){
+    return(ggplot()+theme_bw())
+  }
+
+  class.m <- data.frame(
+    "class" = dom_perc_vect,
+    "type" = type
+  )
+
+  col_map <- list(
+    "Area" = c("#d3e3fd", "#073e97"),
+    "Population" = c("#fdd3d3", "#960808")
+  )
+
+  pal <- rev(colorRampPalette(col_map[[type]])(length(mixed_class)))
+  names(pal) <- names(mixed_class)
+
+  p <- ggplot(class.m, aes(factor(class, levels = names(mixed_class)),
+                      fill = class, color = class))+
+    geom_bar(alpha = .7)+
+    theme_bw()+
+    coord_flip()+
+    scale_y_continuous(expand = expansion(mult =  c(0,0.05)))+
+    scale_fill_manual("Class", values = pal)+
+    scale_color_manual("Class", values = pal)+
+    xlab("Mixed Class")+
+    ylab("Number of Tracts")+
+    ggtitle(paste0("Mixed Class: ", type))+
+    # ggtitle(title)+
+    theme(plot.title = element_text(hjust = .5),
+          text = element_text(size = 15),
+          legend.position = "none",
+          legend.direction = "horizontal")
+
+
+
+  return(p)
+}
