@@ -304,6 +304,17 @@ al. 2022</a>)</p></li>
       "dom_perc_pop_class" = c()
     )
 
+    # render welcome modal ----
+
+    observe({
+      showModal(modalDialog(
+        easyClose = T,
+        title = HTML("<center><b>Welcome to {holcmapr}!</b></center>"),
+        HTML("<p>holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href ='https://dsl.richmond.edu/panorama/redlining/' target = '_blank'>Mapping Inequality website</a>.</p>"),
+        "Note that this package is still undergoing documentation clarification and feature development! This will be updated over the rest of December, so please check back for updates."
+      ))
+    })
+
     # render sidebar output ----
 
     output$methods_tab <- renderRHandsontable({
@@ -608,7 +619,7 @@ al. 2022</a>)</p></li>
       plot_dom_perc_class(city_attr$dom_perc_area_class, "Area")
     })
     output$dom_perc_pop_class <- renderPlot({
-      plot_dom_perc_class(city_attr$dom_perc_area_class, "Population")
+      plot_dom_perc_class(city_attr$dom_perc_pop_class, "Population")
     })
 
     # plot area/pop distributions

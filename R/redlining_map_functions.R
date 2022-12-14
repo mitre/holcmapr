@@ -1259,10 +1259,10 @@ calc_dom_perc <- function(intr_df, type = "exact"){
     ret_pop <- intr_df$dom_perc_pop[intr_df$frac_pop_graded != 0]
   } else {
     ret_area <-
-      as.character(base::cut(intr_df$dom_perc_area, mixed_class,
+      as.character(base::cut(intr_df$dom_perc_area[intr_df$frac_area_graded != 0], mixed_class,
                              names(mixed_class)[-1], include.lowest = T))
     ret_pop <-
-      as.character(base::cut(intr_df$dom_perc_pop, mixed_class,
+      as.character(base::cut(intr_df$dom_perc_pop[intr_df$frac_pop_graded != 0], mixed_class,
                              names(mixed_class)[-1], include.lowest = T))
   }
 
