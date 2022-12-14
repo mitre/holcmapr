@@ -388,6 +388,7 @@ plot_graded_scatter <- function(city, st, intr_df,
   s_df <- data.frame("Area" = area_graded, "Population" = pop_graded)
   # do not compute where both are 0 -- those were never graded anyway
   non_zero <- !(pop_graded == 0 & area_graded == 0)
+  non_zero[is.na(non_zero)] <- F
 
   grade_rmse <- signif(
     sqrt(mean((area_graded[non_zero] - pop_graded[non_zero])^2)),

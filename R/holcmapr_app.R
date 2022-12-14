@@ -101,14 +101,13 @@ run_holcmapr <- function(){
           tabsetPanel(
             tabPanel(
               "City Attributes",
-              HTML("<h3><center>City Attributes: How well do original HOLC neighborhoods match up with current day census boundaries?</center></h3>"),
+              # HTML("<h3><center>City Attributes: How well do original HOLC neighborhoods match up with current day census boundaries?</center></h3>"),
               uiOutput("city_title2"),
               # add short description
               fluidRow(
                 column(
                   width = 4,
-                  fluidRow(plotOutput("city_overlay")),
-                  fluidRow(plotOutput("city_stats"))
+                  fluidRow(plotOutput("city_overlay"))
                 ),
                 column(
                   width = 8,
@@ -129,11 +128,11 @@ run_holcmapr <- function(){
                       fluidRow(
                         column(
                           width = 6,
-                          plotOutput("dom_perc_area_class")
+                          plotOutput("dom_perc_area_class", height = 300)
                         ),
                         column(
                           width = 6,
-                          plotOutput("dom_perc_pop_class")
+                          plotOutput("dom_perc_pop_class", height = 300)
                         )
                       )
                     ),
@@ -154,6 +153,11 @@ run_holcmapr <- function(){
                         )
                       )
 
+                    ),
+                    tabPanel(
+                      "Summary Table",
+                      HTML("<p></p>"),
+                      dataTableOutput("city_stats")
                     )
                   )
                 )
@@ -542,6 +546,55 @@ al. 2022</a>)</p></li>
 
     # plot city attributes ----
 
+    # table of statistics
+    output$city_stats <- renderDataTable({
+      if (nrow(intr_df$thr) > 0){
+        # calculate rmse
+        pop_graded <-
+          (intr_df$thr$total_pop - intr_df$thr$not_graded_pop)/intr_df$thr$total_pop
+        area_graded <-
+          (intr_df$thr$total_area - intr_df$thr$not_graded_area)/
+          intr_df$thr$total_area
+
+        # do not compute where both are 0 -- those were never graded anyway
+        non_zero <- !(pop_graded == 0 & area_graded == 0)
+        non_zero[is.na(non_zero)] <- F
+        grade_rmse <- signif(
+          sqrt(mean((area_graded[non_zero] - pop_graded[non_zero])^2)),
+          4
+        )
+
+        map_class <- function(x){
+          as.character(base::cut(x, mixed_class,
+                                 names(mixed_class)[-1], include.lowest = T))
+        }
+
+        res_df <- data.frame(
+          "Metric" = c("Fraction Graded RMSE",
+                       "Avg. Fraction Graded",
+                       "Avg. Dominant Grade Percentage",
+                       "Avg. Mixed Class"),
+          "Area" = c(grade_rmse,
+                     signif(mean(area_graded[area_graded != 0], na.rm = T), 4),
+                     signif(mean(city_attr$dom_perc_area[area_graded != 0],
+                                 na.rm = T), 4),
+                     map_class(mean(city_attr$dom_perc_area[area_graded != 0],
+                                    na.rm = T))
+          ),
+          "Population" = c(grade_rmse,
+                           signif(mean(pop_graded[pop_graded != 0], na.rm = T), 4),
+                           signif(mean(city_attr$dom_perc_pop[pop_graded != 0],
+                                na.rm = T), 4),
+                           map_class(mean(city_attr$dom_perc_pop[pop_graded != 0],
+                                          na.rm = T))
+          )
+        )
+
+        res_df
+      }
+
+    })
+
     # plot "exact" density plots
     output$dom_perc_area <- renderPlot({
       plot_dom_perc_dens(city_attr$dom_perc_area, "Area")
@@ -556,6 +609,21 @@ al. 2022</a>)</p></li>
     })
     output$dom_perc_pop_class <- renderPlot({
       plot_dom_perc_class(city_attr$dom_perc_area_class, "Population")
+    })
+
+    # plot area/pop distributions
+
+    # plot the grading plot
+    output$area_graded_dens <- renderPlot({
+      plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, T)
+    })
+
+    output$pop_graded_dens <- renderPlot({
+      plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, F)
+    })
+
+    output$graded_scatter <- renderPlot({
+      plot_graded_scatter(pretty_out$city, pretty_out$st, intr_df$thr, T)
     })
 
     # plot map comparison ----
@@ -604,21 +672,6 @@ al. 2022</a>)</p></li>
       })
 
       grid.arrange(grobs = p_list, nrow = ceiling(ncol(poss)/4), top = textGrob("HOLC Grades", gp=gpar(fontface = "bold")))
-    })
-
-    # plot area/pop distributions ----
-
-    # plot the grading plot
-    output$area_graded_dens <- renderPlot({
-      plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, T)
-    })
-
-    output$pop_graded_dens <- renderPlot({
-      plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, F)
-    })
-
-    output$graded_scatter <- renderPlot({
-      plot_graded_scatter(pretty_out$city, pretty_out$st, intr_df$thr, T)
     })
 
     # plot coverage metrics ----
