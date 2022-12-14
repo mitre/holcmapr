@@ -164,7 +164,7 @@ run_holcmapr <- function(){
               ),
             ),
             tabPanel(
-              "Map Comparison",
+              "Method Map Comparison",
               uiOutput("city_title1"),
               HTML("<center>"),
               uiOutput("assignment_plots"),
@@ -173,7 +173,7 @@ run_holcmapr <- function(){
             tabPanel(
               "HOLC Grade Coverage",
               uiOutput("city_title4"),
-              plotOutput("holc_coverage_curr_methods")
+              plotOutput("holc_coverage_curr_methods", height = 750)
             ),
             tabPanel(
               "Linear Models",

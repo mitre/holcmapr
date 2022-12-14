@@ -495,12 +495,13 @@ plot_holc_coverage <- function(city, st, ct, cb, intr_df, holc_pop, in_methods,
     geom_text(position = position_dodge(.9), aes(y = value+3))+
     geom_bar(position = position_dodge(.9), stat = "identity", alpha = .8)+
     theme_bw()+
+    coord_flip()+
     scale_y_continuous(limits = c(0, 105), expand = expansion(mult = c(0, 0)))+
     scale_fill_manual(
       values = c("Area" = "#4287f5", "Population" = "#f54242")
     )+
-    ylab("Percent Coverage")+
-    xlab("Methods")+
+    xlab("Percent Coverage")+
+    ylab("Methods")+
     ggtitle("Percent HOLC Region Covered for Specified Methods and Thresholds")+
     theme(text = element_text(size = 15),
           legend.position = "bottom",
