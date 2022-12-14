@@ -140,7 +140,6 @@ run_holcmapr <- function(){
                     tabPanel(
                       "Area/Population Correlation",
                       HTML("<h5><i><center><p>Area/Population Correlation: How much does a graded area correspond to the currently graded population?</i></center></h5></p>"),
-                      hr(),
                       fluidRow(
                         plotOutput("graded_scatter", height = 300)
                       ),
@@ -153,7 +152,7 @@ run_holcmapr <- function(){
                           width = 6,
                           plotOutput("pop_graded_dens", height = 300)
                         )
-                      ),
+                      )
 
                     )
                   )

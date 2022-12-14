@@ -386,8 +386,11 @@ plot_graded_scatter <- function(city, st, intr_df,
   s_title <- if(plt_grade){"Amount Graded"} else {"HOLC Grade"}
 
   s_df <- data.frame("Area" = area_graded, "Population" = pop_graded)
-  grade_cor <- signif(
-    cor(pop_graded, area_graded, method = "pearson", use = "complete.obs"),
+  # do not compute where both are 0 -- those were never graded anyway
+  non_zero <- !(pop_graded == 0 & area_graded == 0)
+
+  grade_rmse <- signif(
+    sqrt(mean((area_graded[non_zero] - pop_graded[non_zero])^2)),
     4
   )
 
@@ -395,7 +398,7 @@ plot_graded_scatter <- function(city, st, intr_df,
     geom_abline(slope = 1, intercept = 0, color = "#9c9c9c")+
     geom_point(color = "#9C659C")+
     theme_bw()+
-    ggtitle(paste0("Corr.: ", grade_cor),
+    ggtitle(paste0("Root Mean Squared Error (RMSE): ", grade_rmse),
             subtitle = paste0(city, ", ", st))+
     NULL
 
