@@ -189,64 +189,124 @@ run_holcmapr <- function(){
     # about tab ----
     tabPanel(
       "About",
-      fluidRow(
-        column(width = 2),
-        column(
-          width = 8,
-          h2(HTML(
-            "<center><p>Welcome to holcmapr!</center></p>"
-          )),
-          HTML(
-            'holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners\' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href = "https://dsl.richmond.edu/panorama/redlining/" target = "_blank">Mapping Inequality website</a>.<p><p>
+      tabsetPanel(
+        tabPanel(
+          "Welcome",
+          fluidRow(
+            column(width = 2),
+            column(
+              width = 8,
+              h2(HTML(
+                "<center><p>Welcome to holcmapr!</center></p>"
+              )),
+              HTML(
+                'holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners\' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href = "https://dsl.richmond.edu/panorama/redlining/" target = "_blank">Mapping Inequality website</a>.<p><p>',
 
-            <p>holcmapr compares published methods and logical extensions of
-published methods by 3 aspects: method type, contribution, and cutoff in
-the following workflow:</p>
-<div class="figure">
-<center>
-<img src="app_www/figures/fig1_flow.png" alt />
-</center>
-</div>
-<p>These can be customized for comparison for census tracts within
-holcmapr\'s main application.</p>
-<p>Published methods include:</p>
-<ul>
-<li><p>Population-weighted centroids (<a href="https://pubmed.ncbi.nlm.nih.gov/31999951/">Nardone, et al.
-2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35504083/">Mitchell,
-et al. 2022</a>)</p></li>
-<li><p>Proportion of area, filtered by people and housing units (<a href="https://www.tandfonline.com/doi/abs/10.1080/10511482.2005.9521555">Crossney
-and Bartelt 2005</a>)</p></li>
-<li><p>Proportion of area, 20% threshold (<a href="https://ncrc.org/holc-health/">NCRC 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35798451/">Motairek, et al.
-2022</a>)</p></li>
-<li><p>Plurality of area, 50% threshold, remove water areas (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7287548/">Krieger, et
-al. 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/32219369/">Krieger, et
-al. 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35603845/">Wright, et
-al. 2022</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35286901/">Li and
-Yuan 2022</a>)</p></li>
-<li><p>Unweighted area centroids (<a href="https://www.tandfonline.com/doi/full/10.1080/01944363.2020.1759127">Wilson
-2020</a>, <a href="https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2791603">Erikson,
-et al. 2022</a>, <a href="https://link.springer.com/article/10.1007/s10460-022-10340-3">Shaker,
-et al. 2022</a>)</p></li>
-<li><p>Highest graded area (<a href="https://pubmed.ncbi.nlm.nih.gov/34178163/">Li and Yuan
-2020</a>)</p></li>
-<li><p>Total proportion of area, 50% threshold (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8099638/">Lynch, et
-al. 2021</a>)</p></li>
-<li><p>Plurality of area, 0% threshold (<a href="https://pubs.acs.org/doi/full/10.1021/acs.estlett.1c01012">Lane,
-et al. 2022</a>)</p></li>
-<li><p>Plurality of area, 50% threshold (<a href="https://pubmed.ncbi.nlm.nih.gov/33102679/">Lee, et al.
-2022</a>)</p></li>
-<li><p>Rounded proportion of area, 0% threshold (<a href="https://www.pnas.org/doi/abs/10.1073/pnas.2110986118">Mujahid, et
-al. 2022</a>)</p></li>
-<li><p>Proportion of area, 0% threshold (<a href="https://pubmed.ncbi.nlm.nih.gov/35639415/">Linde, et al.
-2022</a>)</p></li>
-</ul>
+                HTML("<p>In order to analyze the relationship between health outcomes and redlining, researchers need to put redlining neighborhoods and evaluation areas (such as census tracts) in the same unit. However, redlining neighborhoods <b>do not always match</b> with census tract areas, depending on city, as we can see below:</p>"),
 
+                HTML('<p><img src="app_www/figures/sfig_redlining_maps_NY.png"></p>'),
 
-          For any questions, comments, or suggestions, please contact the Principal Investigator for this project, Hannah De los Santos (<a href = "mailto:hdelossantos@mitre.org" target = "_blank">hdelossantos@mitre.org</a>).'
+                HTML("<p>In A, we have Manhattan, NY, with the original HOLC map on the left and the the redlined neighborhoods superimposed on the census areas on the right. As you can see, they match up pretty well -- those city blocks are still city blocks, not much as changed. But if we move over to a different part of New York City in B, with Staten Island, NY, we can see those neighborhoods really don't match up well anymore. As such, depending on the city you choose, the method you use to rectify these differences really matters.</p>"),
+
+                HTML("<p>That's where <b>holcmapr</b> can help! This app lets you <b>compare methods</b> for geographically mapping those redlining areas <b>for every redlined city in the US</b>. You can <b>build methods from scratch</b>, based on their attributes, or choose from <b>previously published methods</b> (see the  \"Building/Choosing Methods\" tab). You can then compare those mapping methods across several <b>different metrics</b> (see the  \"How to Comapre Methods\" tab), including how much of the redlined area is retained by the method and how well methods perform in univariate linear models. Once you choose a method, you can <b>download the redlining values</b> for every method in your selected city for your future work (see the  \"How to Export Methods\" tab).</p>"),
+
+                HTML("<p>If you use this work in your research, don't forget to <b>cite us</b> (see the \"Contact and Citation\" tab). If you have any questions, please feel free to reach out.</p>"),
+
+                HTML("<p><b>We hope you enjoy comparing redlining mapping methods!</b></p>")
+
+              )
+            ),
+            column(width = 2)
           )
         ),
-        column(width = 2)
+        tabPanel(
+          "Building/Choosing Comparison Methods",
+          fluidRow(
+            column(width = 2),
+            column(
+              width = 8,
+              HTML(
+                "<p>So you've chosen your redlined city of interest. How can you choose your methods? <b>holcmapr</b> lets you compare methods by building them from scratch and/or choosing from previously published, implemented methods.</p>"
+              ),
+              HTML('<p><b>holcmapr</b> categorizes compares published methods and logical extensions of published methods by 3 aspects: method type, contribution, and cutoff in the following workflow:</p>'),
+              HTML('<p><img src="app_www/figures/fig1_flow.png" height = "400"></p>'),
+              HTML('<p>Choosing mapping methods for comparison uses the following order: </p>'),
+              HTML(
+                '<ol>
+            <li><b>Select Geographic Boundaries:</b> In this case, we\'re choosing census tracts.</li>
+            <li><b>Select Method Type:</b> Method type refers to whether the method uses discrete or continuous grading. Discrete grading picks one of out of all applicable   HOLC grades and uses that grade for the whole area, while in continuous grading, geographic areas receive an average of the multiple applicable HOLC grades.</li>
+            <li><b>Select Method Contribution:</b> Method type refers to whether the method uses area or population to assign grading.</li>
+            <li><b>Select Method Cutoff:</b> Method cutoffs refers to whether the method uses thresholding (requiring some minimum amount of the area/population to be initially graded), weighting (applying grading based on the fraction of area or population represented in the area), or centroid (assigning the grade for the area in which the centroid falls).</li>
+            </ol>'),
+            HTML('<p>Enter those choices in the table on the sidebar in the main app to compare them (right click on a row to add more methods). Once you\'ve gone through the flow chart and entered those attributes for your methods, you\'ll have the methods below:</p>'),
+            HTML(
+              '<ul>
+            <li><b>Proportion of Area:</b> Continuous area method. Assigns points to each grade based on a 4 point scale: A as 1, B as 2, C as 3, and D as 4. The final grade is weighted proportionally by fraction area graded, resulting in a graded value between 1 and 4.</li>
+            <li><b>Proportion of Population:</b> Continuous population method. Assigns points to each grade based on a 4 point scale: A as 1, B as 2, C as 3, and D as 4. To weight each grade, it uses the population of the census blocks that fall within each tract via area-based weighting and summation. The final grade is weighted proportionally by the fraction population within each area graded, resulting in a graded value between 1 and 4.</li>
+            <li><b>Plurality of Area:</b> Discrete area method. Assigns the final grade as the grade with the largest amount of tract area.</li>
+            <li><b>Rounded Proportion of Area:</b> Discrete area method. Takes the result of the proportion of area method and rounds the result to the nearest whole point, mapping these to the original four grades.</li>
+            <li><b>Unweighted centroids:</b> Discrete area method. Assign the final grade as the area where the census tract centroid falls into.</li>
+            <li><b>Plurality of Population:</b> Discrete population method. Assigns the final grade as the grade with the largest amount of tract population, assigned by census blocks.</li>
+            <li><b>Rounded Proportion of Population:</b> Discrete population method. Takes the result of the proportion of population method and rounds the result to the nearest whole point, mapping these to the original four grades.</li>
+            <li><b>Population weighted centroids:</b> Discrete population method. Assign the final grade as the area where the population-weighted census tract centroid falls into.</li>
+            <li><b>...with X% thresholding:</b> Threshold cutoff method. Requires a minimum percentage of the area or population to be initially graded. Thresholds vary from 0% to 50%, with a 10% step.</li>
+            <li><b>...with weighting:</b> Threshold cutoff method. Uses final grades proportionally to the fraction of area or population represented in the tract, adding corresponding weights to models and analysis.</li>
+            </ul>'),
+            HTML('
+            <p>The previously published methods these "from scratch" methodologies are based on are also available for comparison. (If you build a method from scratch that exactly matches a previously published method, the previously published method will be displayed.) Published methods include:</p>
+            <ul>
+            <li><p>Population-weighted centroids (<a href="https://pubmed.ncbi.nlm.nih.gov/31999951/">Nardone, et al.
+            2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35504083/">Mitchell,
+            et al. 2022</a>)</p></li>
+            <li><p>Proportion of area, filtered by people and housing units (<a href="https://www.tandfonline.com/doi/abs/10.1080/10511482.2005.9521555">Crossney
+            and Bartelt 2005</a>)</p></li>
+            <li><p>Proportion of area, 20% threshold (<a href="https://ncrc.org/holc-health/">NCRC 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35798451/">Motairek, et al.
+            2022</a>)</p></li>
+            <li><p>Plurality of area, 50% threshold, remove water areas (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7287548/">Krieger, et
+            al. 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/32219369/">Krieger, et
+            al. 2020</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35603845/">Wright, et
+            al. 2022</a>, <a href="https://pubmed.ncbi.nlm.nih.gov/35286901/">Li and
+            Yuan 2022</a>)</p></li>
+            <li><p>Unweighted area centroids (<a href="https://www.tandfonline.com/doi/full/10.1080/01944363.2020.1759127">Wilson
+            2020</a>, <a href="https://jamanetwork.com/journals/jamanetworkopen/fullarticle/2791603">Erikson,
+            et al. 2022</a>, <a href="https://link.springer.com/article/10.1007/s10460-022-10340-3">Shaker,
+            et al. 2022</a>)</p></li>
+            <li><p>Highest graded area (<a href="https://pubmed.ncbi.nlm.nih.gov/34178163/">Li and Yuan
+            2020</a>)</p></li>
+            <li><p>Total proportion of area, 50% threshold (<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8099638/">Lynch, et
+            al. 2021</a>)</p></li>
+            <li><p>Plurality of area, 0% threshold (<a href="https://pubs.acs.org/doi/full/10.1021/acs.estlett.1c01012">Lane,
+            et al. 2022</a>)</p></li>
+            <li><p>Plurality of area, 50% threshold (<a href="https://pubmed.ncbi.nlm.nih.gov/33102679/">Lee, et al.
+            2022</a>)</p></li>
+            <li><p>Rounded proportion of area, 0% threshold (<a href="https://www.pnas.org/doi/abs/10.1073/pnas.2110986118">Mujahid, et
+            al. 2022</a>)</p></li>
+            <li><p>Proportion of area, 0% threshold (<a href="https://pubmed.ncbi.nlm.nih.gov/35639415/">Linde, et al.
+            2022</a>)</p></li>
+            </ul>'
+            )
+            )
+          )
+
+        ),
+        tabPanel(
+          "How to Compare Methods"
+        ),
+        tabPanel(
+          "How to Export Methods"
+        ),
+        tabPanel(
+          "Contact and Citation",
+          fluidRow(
+            column(width = 2),
+            column(
+              width = 8,
+              'For any questions, comments, or suggestions, please contact the maintainer for this package, Hannah De los Santos, at (<a href = "mailto:hdelossantos@mitre.org" target = "_blank">hdelossantos@mitre.org</a>).'
+            )
+          )
+        )
       )
+
     )
   )
 
@@ -310,8 +370,19 @@ al. 2022</a>)</p></li>
       showModal(modalDialog(
         easyClose = T,
         title = HTML("<center><b>Welcome to {holcmapr}!</b></center>"),
-        HTML("<p>holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href ='https://dsl.richmond.edu/panorama/redlining/' target = '_blank'>Mapping Inequality website</a>.</p>"),
-        "Note that this package is still undergoing documentation clarification and feature development! This will be updated over the rest of December, so please check back for updates."
+        fluidRow(
+          column(
+            width = 12,
+            HTML("<p><b>holcmapr</b> is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href ='https://dsl.richmond.edu/panorama/redlining/' target = '_blank'>Mapping Inequality website</a>.</p>"),
+            HTML("<p>In order to analyze the relationship between health outcomes and redlining, researchers need to put redlining neighborhoods and evaluation areas (such as census tracts) in the same unit. However, redlining neighborhoods <b>do not always match</b> with census tract areas, depending on city.</p>"),
+            # HTML('<p><img src="app_www/figures/" height = "300"></p>'),
+            img(src = file.path("app_www","figures", "sfig_redlining_maps_NY.png"), align = "center", width = "100%"),
+            HTML("<p>This app lets you <b>compare methods</b> for geographically mapping those redlining areas <b>for every redlined city in the US</b>. You can <b>build methods from scratch</b>, based on their attributes, or choose from <b>previously published methods</b>. You can then compare those mapping methods across several <b>different metrics</b>, including how much of the redlined area is retained by the method and how well methods perform in univariate linear models. Once you choose a method, you can <b>download the redlining values</b> for every method in your selected city for your future work.</p>"),
+            HTML("<p>For more information on what these methods are, <b>check out the tooltips</b> throughout this application and the <b>About page</b> for more detailed information. If you use this work in your research, don't forget to cite us.</p>"),
+            HTML("<p><b>We hope you enjoy comparing redlining mapping methods!</b></p>")
+          )
+        )
+
       ))
     })
 
