@@ -112,11 +112,11 @@ run_holcmapr <- function(){
         # main panel ----
         mainPanel(
           width = 8,
+          uiOutput("city_title2"),
           tabsetPanel(
             tabPanel(
               "City Attributes",
               # HTML("<h3><center>City Attributes: How well do original HOLC neighborhoods match up with current day census boundaries?</center></h3>"),
-              uiOutput("city_title2"),
               # add short description
               fluidRow(
                 column(
@@ -179,19 +179,16 @@ run_holcmapr <- function(){
             ),
             tabPanel(
               "Method Map Comparison",
-              uiOutput("city_title1"),
               HTML("<center>"),
               uiOutput("assignment_plots"),
               HTML("</center>")
             ),
             tabPanel(
               "HOLC Grade Coverage",
-              uiOutput("city_title4"),
               plotOutput("holc_coverage_curr_methods", height = 750)
             ),
             tabPanel(
               "Linear Models",
-              uiOutput("city_title6"),
               HTML("<center><h3>Predicted Linear Models</h3></center>"),
               uiOutput("lin_mod_ui")
 
