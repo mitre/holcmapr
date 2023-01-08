@@ -196,9 +196,10 @@ run_holcmapr <- function(){
             column(width = 2),
             column(
               width = 8,
-              h2(HTML(
+              h3(HTML(
                 "<center><p>Welcome to holcmapr!</center></p>"
               )),
+              hr(),
               HTML(
                 'holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners\' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the <a href = "https://dsl.richmond.edu/panorama/redlining/" target = "_blank">Mapping Inequality website</a>.<p><p>',
 
@@ -225,6 +226,8 @@ run_holcmapr <- function(){
             column(width = 2),
             column(
               width = 8,
+              h3("Building/Choosing Comparison Methods"),
+              hr(),
               HTML(
                 "<p>So you've chosen your redlined city of interest. How can you choose your methods? <b>holcmapr</b> lets you compare methods by building them from scratch and/or choosing from previously published, implemented methods.</p>"
               ),
@@ -290,7 +293,38 @@ run_holcmapr <- function(){
 
         ),
         tabPanel(
-          "How to Compare Methods"
+          "How to Compare Methods",
+          fluidRow(
+            column(width = 2),
+            column(
+              width = 8,
+              h3("How to Compare Methods"),
+              hr(),
+              HTML("<p>Now that you've decided on your methods, how can you compare and choose between them in <b>holcmapr</b>? <b>holcmapr</b> lets you understand the <b>mapping baseline</b> in your city, <b>compare maps for chosen methods</b>, compare redlined <b>neighborhood coverage</b>, and compare the results of <b>linear health associations</b>.</p>"),
+
+              p(h4("City Attributes")),
+              p("Before we even understand which methods do well against each other, we need understand to the baseline of how well those HOLC neighborhoods match with current day census tracts. When we go to this tab, we'll see the following attributes to evaluate it:"),
+              HTML(
+                "<ul>
+                <li><b>Census Tracts with HOLC Grade Overlay:</b> a map of census tracts with original HOLC neighborhoods overlaid.</li>
+                <li><b>Dominant Grade Percentage:</b> These graphs let us answer the question, \"How much area or population does the dominant grade take up?\", or \"Are census tracts mostly graded with one grade?\" High values of the dominant grade percentage for each tract mean that this tract is not very mixed, and only has one grade -- the HOLC neiborhood and that tract line up well. These values are displayed in density graphs. We also bin these into qualitative labels for easy interpretation in bar graphs:  [0, 1] as Not Graded; (1, 25] as Very Mixed; (25, 50] as Mixed; (50, 75] as Moderately Mixed; (75, 99] as Not Very Mixed; (99, 100] as Not Mixed.</li>
+                <li><b>Area/Population Correlation:</b> These graphs let us answer the question, \"How much does a graded area correspond to the currently graded population??\", or \"Can I use area and population interchangeably in my method choice?\" The top graph displays fraction of each tract's area that is graded versus each tract's population. This is also summarized by the Root Mean Squared Error (RMSE). Lower values of RMSE indicate that they line up perfectly, while higher values indicate that they do not line up at all. Distributions of the fraction of area and population graded within all census tracts for the chosen city are displayed below.</li>
+                <li><b>Summary Table:</b> This summary table places all the high level statistics to answer these questions in one table: the fraction graded RMSE, the average fraction graded, the average dominant percentage, and the average mixed class.</li>
+                </ul>"
+              ),
+              p("With all that information, we can now understand how well those HOLC neighborhoods match up to the census tracts, giving us a basis of comparison for our chosen methods."),
+
+              p(h4("Method Map Comparison")),
+              p("Now that we understand what we're working with in terms of mapping in our city, we can look at what the census tracts our methods have chosen and how they've graded them in their maps. To the left, you'll see the census tracts with a HOLC grade overlay as a baseline. To the right, you'll see the maps for all the methods you've chosen. Continuous methods will show a continuous color scale between the grades for all tracts. Discete methods will show a set color for each grade. If weighting is chosen, opacity will be added to the map for the fraction of area or population in that tract."),
+
+              p(h4("HOLC Grade Coverage")),
+              p(HTML("Now we'll start comparing our methods with different metrics. The first being <b>neighborhood coverage</b>. Neighborhood coverage lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method’s final set of census tracts. We then add a penalty for ungraded area of tracts to discourage methods that include any tract with graded neighborhood overlap (e.g., area edges pulled from different sources not exactly lining up due to projection effects). The penalty is set to 0.5 by default (and can be adjusted in the advanced options to between [0, 1]). For example, if a method includes a tract that is half graded and does not take any tracts with the remaining half of the graded neighborhood, its area neighborhood coverage would be 50% (graded area) – 50% (ungraded area) * 0.5 (penalty) = 25%.")),
+              p("Neighborhood coverage is displayed in a comparison bar graph for both area and population."),
+
+              p(h4("Linear Models")),
+              p("Our last set of metrics compares how much method choice influences associations with health related outcomes. To do this, we perform a univariate linear model for each selected method and the health outcome. Health outcomes are life expectancy, physical health, and mental health. In this tab, a scatterplot with linear model fit is displayed for each method. In each of these plots, we can see the resulting R^2 and p-value for the fit. Note that these fits are only for the purpose of comparing methods; this is not a fully adjusted model and should not be used to extrapolate the relationship between redlining and your selected health outcome.")
+            )
+          )
         ),
         tabPanel(
           "How to Export Methods"
