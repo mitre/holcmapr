@@ -54,4 +54,5 @@ Imports:
   sp,
   dplyr,
   colorspace,
-  methods
+  methods,
+  shinyBS

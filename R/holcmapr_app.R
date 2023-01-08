@@ -6,7 +6,7 @@
 
 #' Function to run redlining mapping methodology comparison app.
 #'
-#' @import shiny broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable rgeos raster rgdal
+#' @import shiny broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable rgeos raster rgdal shinyBS
 #' @importFrom shinyWidgets materialSwitch
 #' @importFrom grid textGrob gpar
 #' @importFrom gridExtra grid.arrange
@@ -49,51 +49,65 @@ run_holcmapr <- function(){
         # sidebar with choices ----
         sidebarPanel(
           width = 4,
-          selectInput(
-            "city_state",
-            "Choose the city you want to visualize:",
-            choices = unique(paste0(holc_dat$city,", ", holc_dat$state))
-          ),
-          HTML("<p><b>Choose the mapping methods you would like to compare: </b>(Examples appear below. To add more methods, right click to add a row. For more information choosing Type, Contribution, and Cutoff, see the about page.)</p>"),
-          rHandsontableOutput("methods_tab"),
-          HTML("<p></p>"),
-          selectInput(
-            "paper_methods",
-            "Choose any previously published mapping methods you would like to compare:",
-            choices = paper_avail,
-            multiple = T
-          ),
-          materialSwitch(
-            "add_outcome",
-            HTML("<b>Overlay health outcome in map plots?</b>"),
-            value = F,
-            status = "primary",
-          ),
-          selectInput(
-            "which_outcome",
-            "Which health outcome would you like to observe in overlays and linear models?",
-            choices = c(
-              "Life Expectancy" = "le",
-              "Physical Health" = "ph",
-              "Mental Health" = "mh"
+          bsCollapse(
+            multiple = T,
+            open = c("Select Methods", "Update and Export"),
+            bsCollapsePanel(
+              "Select Methods",
+              p(HTML('<b>holcmapr</b> lets you implement and compare methods of mapping Home Owners\' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about this application and how to use it, please see the <b>About</b> tab.')),
+              selectInput(
+                "city_state",
+                "Choose the city you want to visualize:",
+                choices = unique(paste0(holc_dat$city,", ", holc_dat$state))
+              ),
+              HTML("<p><b>Choose the mapping methods you would like to compare: </b>(Examples appear below. To add more methods, right click to add a row. For more information choosing Type, Contribution, and Cutoff, see the about page.)</p>"),
+              rHandsontableOutput("methods_tab"),
+              HTML("<p></p>"),
+              selectInput(
+                "paper_methods",
+                "Choose any previously published mapping methods you would like to compare:",
+                choices = paper_avail,
+                multiple = T
+              ),
+              materialSwitch(
+                "add_outcome",
+                HTML("<b>Overlay health outcome in map plots?</b>"),
+                value = F,
+                status = "primary",
+              ),
+              selectInput(
+                "which_outcome",
+                "Which health outcome would you like to observe in overlays and linear models?",
+                choices = c(
+                  "Life Expectancy" = "le",
+                  "Physical Health" = "ph",
+                  "Mental Health" = "mh"
+                ),
+                selected = "le"
+              )
             ),
-            selected = "le"
-          ),
-          checkboxInput(
-            "add_penalty",
-            HTML("<b>Add weighted penalty for including ungraded areas?</b>"),
-            value = T
-          ),
-          numericInput(
-            "pen_wt",
-            "Penalty weight (between 0 and 1):",
-            value = .5,
-            step = .1,
-            min = 0,
-            max = 1
+            bsCollapsePanel(
+              "Advanced Options",
+              checkboxInput(
+                "add_penalty",
+                HTML("<b>Add weighted penalty for including ungraded areas?</b>"),
+                value = T
+              ),
+              numericInput(
+                "pen_wt",
+                "Penalty weight (between 0 and 1):",
+                value = .5,
+                step = .1,
+                min = 0,
+                max = 1
+              )
             ),
-          actionButton("upd", "Update!"),
-          downloadButton("download_dat", "Download Mapping Data (.csv)")
+            bsCollapsePanel(
+              "Update and Export",
+              actionButton("upd", "Update!"),
+              downloadButton("download_dat", "Download Mapping Data (.csv)")
+            )
+          )
         ),
         # main panel ----
         mainPanel(
