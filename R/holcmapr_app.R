@@ -337,8 +337,38 @@ run_holcmapr <- function(){
             )
           )
         ),
+        # how to export ----
         tabPanel(
-          "How to Export Methods"
+          "How to Export Methods",
+          fluidRow(
+            column(width = 2),
+            column(
+              width = 8,
+              h3("How to Export Methods"),
+              hr(),
+              p("Once you've decided the methods you're comparing, you can export out grades for every census tract for every method selected in your city. Clicking \"Download Mapping Data (.csv)\" will download a CSV with the following columns:"),
+              HTML(
+                "<ul>
+            <li><b>GEOID:</b> Census Tract ID</li>
+            <li><b>(A,B,C,D)_area:</b> (A,B,C,D) graded area within census tract, in km^2</li>
+            <li><b>not_graded_area:</b> Area not assigned to any grade within census tract, in km^2</li>
+            <li><b>total_area:</b> Total area in census tract</li>
+            <li><b>(A,B,C,D)_pop:</b> (A,B,C,D) graded population within census tract</li>
+            <li><b>not_graded_pop:</b> Population not assigned to any grade within census tract</li>
+            <li><b>total_pop:</b> Total population in census tract</li>
+            <li><b>(built method: [type]_[contribution]_[amount of threshold, if used][cutoff]):</b> Methods built from scratch, that were not previously published. Results for a previously published method. Discrete methods have grades from A to D, continuous methods have grades from 1 to 4 or 0 to 4 (for Lynch, et al.). Not graded tracts appear as empty values.
+            <ul>
+              <li><b>Type:</b> prop = Proportion of. plurality = Plurality of. round = Rounded Proportion of.</li>
+              <li><b>Contibution:</b> area = Area. pop = Population.</li>
+              <li><b>Cutoff:</b> thr = Threshold. wt = Weighting.</li>
+            </ul></li>
+            <li><b>(centroid method: w_centroid, unw_centroid):</b> Centroid method results, if chosen. w_centroid = Population weighted centroid. unw_centroid = Area centroid. Also adds columns for latitude (lat) and longitude (long) of each centroid. Grades appear from A to D.</li>
+            <li><b>(previously published method: crossney, ncrc, krieger, li, lynch, lane, lee, mujahid):</b> Results for a previously published method. Discrete methods have grades from A to D, continuous methods have grades from 1 to 4 or 0 to 4 (for Lynch, et al.). Not graded tracts appear as empty values.</li>
+            </ul>"
+              )
+            )
+          )
+
         ),
         tabPanel(
           "Contact and Citation",
@@ -346,7 +376,25 @@ run_holcmapr <- function(){
             column(width = 2),
             column(
               width = 8,
-              'For any questions, comments, or suggestions, please contact the maintainer for this package, Hannah De los Santos, at (<a href = "mailto:hdelossantos@mitre.org" target = "_blank">hdelossantos@mitre.org</a>).'
+              h3("Contact and Citation"),
+              hr(),
+              p("If you're using `holcmapr` or any of its content, please cite us and let us know you're using it at opensource@mitre.org. To see citation information for holcmapr, enter the following in the console window:"),
+              p(code(
+                'citation("holcmapr")'
+              )),
+              HTML(
+                '<p>The data sources used in this package are:</p>
+<ul>
+<li><a href="https://dsl.richmond.edu/panorama/redlining/">Mapping Inequality</a>: Redlining Spatial Files</li>
+<li><a href="https://download.geonames.org/export/zip/">GeoNames Postal Code Files</a>: Mapping cities to counties</li>
+<li><a href="https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html">US Census Bureau Centers of Population (2010)</a>: Population centers for census tracts, for population-weighted centroid method</li>
+<li><a href="https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html">USALEEP Life Expectancy</a>: Life expectancy census tract estimates</li>
+<li><a href="https://www.cdc.gov/places">CDC Places</a>: Mental health and physical health census tract estimates</li>
+</ul>
+'
+              ),
+
+              p('For any questions, comments, or suggestions, please contact the maintainer for this package, Hannah De los Santos at hdelossantos@mitre.org.')
             )
           )
         )

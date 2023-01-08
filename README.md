@@ -59,7 +59,7 @@ The results with mapping for each method are also available for download by CSV,
 
 ## Data Sources & Citation
 
-If you're using `holcmapr` or any of it's content, please cite us and let us know you're using it at opensource@mitre.org. To see citation information for `holcmapr`, enter the following in the console window:
+If you're using `holcmapr` or any of its content, please cite us and let us know you're using it at opensource@mitre.org. To see citation information for `holcmapr`, enter the following in the console window:
 
 ```r
 citation("holcmapr")
@@ -74,6 +74,6 @@ The data sources used in this package are:
 
 ## Contact & Attribution
 
-For any questions or concerns, please contact Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org)).
+For any questions or concerns, please contact the maintainer for this package, Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org)).
 
 ©2021 The MITRE Corporation. ALL RIGHTS RESERVED.
