@@ -916,6 +916,7 @@ plot_dom_perc_class <- function(dom_perc_vect, type = "Area"){
     "class" = dom_perc_vect,
     "type" = type
   )
+  class.m <- class.m[complete.cases(class.m),]
 
   col_map <- list(
     "Area" = c("#d3e3fd", "#073e97"),
@@ -925,7 +926,7 @@ plot_dom_perc_class <- function(dom_perc_vect, type = "Area"){
   pal <- rev(colorRampPalette(col_map[[type]])(length(mixed_class)))
   names(pal) <- names(mixed_class)
 
-  p <- ggplot(class.m, aes(factor(class, levels = names(mixed_class)),
+  p <- ggplot(class.m, aes(factor(class, levels = rev(names(mixed_class))),
                       fill = class, color = class))+
     geom_bar(alpha = .7)+
     theme_bw()+
