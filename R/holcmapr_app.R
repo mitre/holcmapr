@@ -13,6 +13,7 @@
 #' @importFrom scales rescale
 #' @importFrom sp spTransform SpatialPoints over
 #' @importFrom utils combn write.csv
+#' @importFrom bsplus shiny_iconlink bs_embed_popover
 #' @export
 #'
 #' @examples
@@ -60,14 +61,39 @@ run_holcmapr <- function(){
                 "Choose the city you want to visualize:",
                 choices = unique(paste0(holc_dat$city,", ", holc_dat$state))
               ),
-              HTML("<p><b>Choose the mapping methods you would like to compare: </b>(Examples appear below. To add more methods, right click to add a row. For more information choosing Type, Contribution, and Cutoff, see the about page.)</p>"),
+              HTML("<p><b>Choose the mapping methods you would like to compare: </b>"),
+              shiny_iconlink(id = "create_tt"),
+              bsTooltip(
+                id = "create_tt",
+                title = "Examples appear below. To add more methods, right click to add a row. For more information choosing Type, Contribution, and Cutoff, see the Building/Choosing Comparison Methods tab in the About page.",
+                placement = "right",
+                trigger = "hover",
+                options = list(container = "body")
+
+              ),
+              HTML("</p>"),
               rHandsontableOutput("methods_tab"),
               HTML("<p></p>"),
-              selectInput(
-                "paper_methods",
-                "Choose any previously published mapping methods you would like to compare:",
-                choices = paper_avail,
-                multiple = T
+
+              div(style="display: inline-block; width: 90%;",
+                  selectInput(
+                    "paper_methods",
+                    "Choose any previously published mapping methods you would like to compare:",
+                    choices = paper_avail,
+                    multiple = T
+                  )
+              ),
+
+              div(style="display: inline-block; width: 5%; vertical-align: top;",
+                  shiny_iconlink(id = "prev_tt"),
+                  bsTooltip(
+                    id = "prev_tt",
+                    title = "For more information about previous methods, see the Building/Choosing Comparison Methods tab in the About page.",
+                    placement = "right",
+                    trigger = "hover",
+                    options = list(container = "body")
+
+                  )
               ),
               materialSwitch(
                 "add_outcome",
@@ -115,9 +141,11 @@ run_holcmapr <- function(){
           uiOutput("city_title2"),
           tabsetPanel(
             tabPanel(
-              "City Attributes",
-              # HTML("<h3><center>City Attributes: How well do original HOLC neighborhoods match up with current day census boundaries?</center></h3>"),
-              # add short description
+              title = tipify(
+                div("City Attributes"),
+                title =  "These metrics answer: \"How well do original HOLC neighborhoods match up with current day census boundaries?\" and give us a basis of comparison for our chosen methods. For more information, see \"How to Compare Methods\" on the About page."
+
+              ),
               fluidRow(
                 column(
                   width = 4,
@@ -127,8 +155,11 @@ run_holcmapr <- function(){
                   width = 8,
                   tabsetPanel(
                     tabPanel(
-                      "Dominant Grade Percentage",
-                      HTML("<h5><i><center><p>Dominant Grade Percentage: how much area or population does the dominant grade take up?</i></center></h5></p>"),
+                      title = tipify(
+                        div("Dominant Grade Percentage"),
+                        title = "These metrics answer: \"Are census tracts mostly graded with one grade?\" and are done for both area and population. High values of the dominant grade percentage for each tract mean that this tract has mostly one grade. For more information, see \"How to Compare Methods\" on the About page.",
+                        placement = "bottom"
+                      ),
                       fluidRow(
                         column(
                           width = 6,
@@ -151,8 +182,10 @@ run_holcmapr <- function(){
                       )
                     ),
                     tabPanel(
-                      "Area/Population Correlation",
-                      HTML("<h5><i><center><p>Area/Population Correlation: How much does a graded area correspond to the currently graded population?</i></center></h5></p>"),
+                      title = tipify(
+                        div("Area/Population Correlation"),
+                        title = "These metrics answer: \"How much does a graded area correspond to the currently graded population?\". This lets us know if we can use area and population interchagably in our methods. Lower values of Root Mean Squared Error (RMSE) indicate that area and population line up perfectly. For more information, see \"How to Compare Methods\" on the About page."
+                      ),
                       fluidRow(
                         plotOutput("graded_scatter", height = 300)
                       ),
@@ -169,7 +202,10 @@ run_holcmapr <- function(){
 
                     ),
                     tabPanel(
-                      "Summary Table",
+                      title = tipify(
+                        div("Summary Table"),
+                        title = "This summary table places all the high level statistics to answer these questions in one table. For more information, see \"How to Compare Methods\" on the About page."
+                      ),
                       HTML("<p></p>"),
                       dataTableOutput("city_stats")
                     )
@@ -178,18 +214,25 @@ run_holcmapr <- function(){
               ),
             ),
             tabPanel(
-              "Method Map Comparison",
+              title = tipify(
+                div("Method Map Comparison"),
+                title = "Shows what census tracts our methods have chosen and how they've graded them in maps. For more information, see \"How to Compare Methods\" on the About page."
+              ),
               HTML("<center>"),
               uiOutput("assignment_plots"),
               HTML("</center>")
             ),
             tabPanel(
-              "HOLC Grade Coverage",
+              tipify(
+                div("HOLC Grade Coverage"),
+                title = "This metric lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method’s final set of census tracts. For more information, see \"How to Compare Methods\" on the About page."
+              ),
               plotOutput("holc_coverage_curr_methods", height = 750)
             ),
             tabPanel(
-              "Linear Models",
-              HTML("<center><h3>Predicted Linear Models</h3></center>"),
+              tipify(
+                div("Linear Models"),
+                title = "This metric compares how much method choice influences associations with health related outcomes, including R squared and p-values. For more information, see \"How to Compare Methods\" on the About page."),
               uiOutput("lin_mod_ui")
 
             )
@@ -231,6 +274,7 @@ run_holcmapr <- function(){
             column(width = 2)
           )
         ),
+        # choosing comparison methods ----
         tabPanel(
           "Building/Choosing Comparison Methods",
           fluidRow(
@@ -303,6 +347,7 @@ run_holcmapr <- function(){
           )
 
         ),
+        # how to compare methods -----
         tabPanel(
           "How to Compare Methods",
           fluidRow(
@@ -318,15 +363,15 @@ run_holcmapr <- function(){
               HTML(
                 "<ul>
                 <li><b>Census Tracts with HOLC Grade Overlay:</b> a map of census tracts with original HOLC neighborhoods overlaid.</li>
-                <li><b>Dominant Grade Percentage:</b> These graphs let us answer the question, \"How much area or population does the dominant grade take up?\", or \"Are census tracts mostly graded with one grade?\" High values of the dominant grade percentage for each tract mean that this tract is not very mixed, and only has one grade -- the HOLC neiborhood and that tract line up well. These values are displayed in density graphs. We also bin these into qualitative labels for easy interpretation in bar graphs:  [0, 1] as Not Graded; (1, 25] as Very Mixed; (25, 50] as Mixed; (50, 75] as Moderately Mixed; (75, 99] as Not Very Mixed; (99, 100] as Not Mixed.</li>
-                <li><b>Area/Population Correlation:</b> These graphs let us answer the question, \"How much does a graded area correspond to the currently graded population??\", or \"Can I use area and population interchangeably in my method choice?\" The top graph displays fraction of each tract's area that is graded versus each tract's population. This is also summarized by the Root Mean Squared Error (RMSE). Lower values of RMSE indicate that they line up perfectly, while higher values indicate that they do not line up at all. Distributions of the fraction of area and population graded within all census tracts for the chosen city are displayed below.</li>
+                <li><b>Dominant Grade Percentage:</b> These graphs let us answer the question, \"How much area or population does the dominant grade take up?\", or \"Are census tracts mostly graded with one grade?\" High values of the dominant grade percentage for each tract mean that this tract is not very mixed, and only has one grade -- the HOLC neighborhood and that tract line up well. These values are displayed in density graphs. We also bin these into qualitative labels for easy interpretation in bar graphs:  [0, 1] as Not Graded; (1, 25] as Very Mixed; (25, 50] as Mixed; (50, 75] as Moderately Mixed; (75, 99] as Not Very Mixed; (99, 100] as Not Mixed.</li>
+                <li><b>Area/Population Correlation:</b> These graphs let us answer the question, \"How much does a graded area correspond to the currently graded population?\", or \"Can I use area and population interchangeably in my method choice?\" The top graph displays fraction of each tract's area that is graded versus each tract's population. This is also summarized by the Root Mean Squared Error (RMSE). Lower values of RMSE indicate that they line up perfectly, while higher values indicate that they do not line up at all. Distributions of the fraction of area and population graded within all census tracts for the chosen city are displayed below.</li>
                 <li><b>Summary Table:</b> This summary table places all the high level statistics to answer these questions in one table: the fraction graded RMSE, the average fraction graded, the average dominant percentage, and the average mixed class.</li>
                 </ul>"
               ),
               p("With all that information, we can now understand how well those HOLC neighborhoods match up to the census tracts, giving us a basis of comparison for our chosen methods."),
 
               p(h4("Method Map Comparison")),
-              p("Now that we understand what we're working with in terms of mapping in our city, we can look at what the census tracts our methods have chosen and how they've graded them in their maps. To the left, you'll see the census tracts with a HOLC grade overlay as a baseline. To the right, you'll see the maps for all the methods you've chosen. Continuous methods will show a continuous color scale between the grades for all tracts. Discete methods will show a set color for each grade. If weighting is chosen, opacity will be added to the map for the fraction of area or population in that tract."),
+              p("Now that we understand what we're working with in terms of mapping in our city, we can look at what census tracts our methods have chosen and how they've graded them in their maps. To the left, you'll see the census tracts with a HOLC grade overlay as a baseline. To the right, you'll see the maps for all the methods you've chosen. Continuous methods will show a continuous color scale between the grades for all tracts. Discete methods will show a set color for each grade. If weighting is chosen, opacity will be added to the map for the fraction of area or population in that tract."),
 
               p(h4("HOLC Grade Coverage")),
               p(HTML("Now we'll start comparing our methods with different metrics. The first being <b>neighborhood coverage</b>. Neighborhood coverage lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method’s final set of census tracts. We then add a penalty for ungraded area of tracts to discourage methods that include any tract with graded neighborhood overlap (e.g., area edges pulled from different sources not exactly lining up due to projection effects). The penalty is set to 0.5 by default (and can be adjusted in the advanced options to between [0, 1]). For example, if a method includes a tract that is half graded and does not take any tracts with the remaining half of the graded neighborhood, its area neighborhood coverage would be 50% (graded area) – 50% (ungraded area) * 0.5 (penalty) = 25%.")),
@@ -370,6 +415,7 @@ run_holcmapr <- function(){
           )
 
         ),
+        # contact and citation ----
         tabPanel(
           "Contact and Citation",
           fluidRow(
