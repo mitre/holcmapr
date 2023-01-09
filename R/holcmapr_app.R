@@ -225,7 +225,7 @@ run_holcmapr <- function(){
             tabPanel(
               tipify(
                 div("HOLC Grade Coverage"),
-                title = "This metric lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method’s final set of census tracts. For more information, see \"How to Compare Methods\" on the About page."
+                title = "This metric lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method's final set of census tracts. For more information, see \"How to Compare Methods\" on the About page."
               ),
               plotOutput("holc_coverage_curr_methods", height = 750)
             ),
@@ -374,7 +374,7 @@ run_holcmapr <- function(){
               p("Now that we understand what we're working with in terms of mapping in our city, we can look at what census tracts our methods have chosen and how they've graded them in their maps. To the left, you'll see the census tracts with a HOLC grade overlay as a baseline. To the right, you'll see the maps for all the methods you've chosen. Continuous methods will show a continuous color scale between the grades for all tracts. Discete methods will show a set color for each grade. If weighting is chosen, opacity will be added to the map for the fraction of area or population in that tract."),
 
               p(h4("HOLC Grade Coverage")),
-              p(HTML("Now we'll start comparing our methods with different metrics. The first being <b>neighborhood coverage</b>. Neighborhood coverage lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method’s final set of census tracts. We then add a penalty for ungraded area of tracts to discourage methods that include any tract with graded neighborhood overlap (e.g., area edges pulled from different sources not exactly lining up due to projection effects). The penalty is set to 0.5 by default (and can be adjusted in the advanced options to between [0, 1]). For example, if a method includes a tract that is half graded and does not take any tracts with the remaining half of the graded neighborhood, its area neighborhood coverage would be 50% (graded area) – 50% (ungraded area) * 0.5 (penalty) = 25%.")),
+              p(HTML("Now we'll start comparing our methods with different metrics. The first being <b>neighborhood coverage</b>. Neighborhood coverage lets us understand how much of the originally HOLC graded area is included in final analyses by the different redlining methods. We estimate this coverage based on area and population by calculating how much of the originally graded area or population is included by each method's final set of census tracts. We then add a penalty for ungraded area of tracts to discourage methods that include any tract with graded neighborhood overlap (e.g., area edges pulled from different sources not exactly lining up due to projection effects). The penalty is set to 0.5 by default (and can be adjusted in the advanced options to between [0, 1]). For example, if a method includes a tract that is half graded and does not take any tracts with the remaining half of the graded neighborhood, its area neighborhood coverage would be 50% (graded area) - 50% (ungraded area) * 0.5 (penalty) = 25%.")),
               p("Neighborhood coverage is displayed in a comparison bar graph for both area and population."),
 
               p(h4("Linear Models")),
@@ -424,7 +424,7 @@ run_holcmapr <- function(){
               width = 8,
               h3("Contact and Citation"),
               hr(),
-              p("If you're using `holcmapr` or any of its content, please cite us and let us know you're using it at opensource@mitre.org. To see citation information for holcmapr, enter the following in the console window:"),
+              p("If you're using \"holcmapr\" or any of its content, please cite us and let us know you're using it at opensource@mitre.org. To see citation information for holcmapr, enter the following in the console window:"),
               p(code(
                 'citation("holcmapr")'
               )),
@@ -665,8 +665,6 @@ run_holcmapr <- function(){
         city_attr$dom_perc_pop <- dom_perc_res$pop
         city_attr$dom_perc_area_class <- dom_perc_class$area
         city_attr$dom_perc_pop_class <- dom_perc_class$pop
-
-        intr_df_main <<- intr_df$thr
       })
     }))
 

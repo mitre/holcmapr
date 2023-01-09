@@ -879,6 +879,8 @@ plot_dom_perc_dens <- function(dom_perc_vect, type = "Area"){
     return(ggplot()+theme_bw())
   }
 
+  dom_perc <- NULL
+
   frac.m <- data.frame(
     "dom_perc"  = dom_perc_vect,
     "type" = type
@@ -905,6 +907,7 @@ plot_dom_perc_dens <- function(dom_perc_vect, type = "Area"){
 
 #' function to plot dominant percentage class bar plot
 #' @param type "Area" or "Population"
+#' @importFrom grDevices colorRampPalette
 #' @keywords internal
 #' @noRd
 plot_dom_perc_class <- function(dom_perc_vect, type = "Area"){
