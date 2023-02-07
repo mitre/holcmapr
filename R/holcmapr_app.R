@@ -291,7 +291,7 @@ run_holcmapr <- function(){
               HTML('<p>Choosing mapping methods for comparison uses the following order: </p>'),
               HTML(
                 '<ol>
-            <li><b>Select Geographic Boundaries:</b> In this case, we\'re choosing census tracts.</li>
+            <li><b>Select Geographic Boundaries:</b> In this case, we\'re choosing census tracts. holcmapr currently only supports comparisons for Census Tracts, currently using 2010 geo shapefiles.</li>
             <li><b>Select Method Type:</b> Method type refers to whether the method uses discrete or continuous grading. Discrete grading picks one of out of all applicable   HOLC grades and uses that grade for the whole area, while in continuous grading, geographic areas receive an average of the multiple applicable HOLC grades.</li>
             <li><b>Select Method Contribution:</b> Method type refers to whether the method uses area or population to assign grading.</li>
             <li><b>Select Method Cutoff:</b> Method cutoffs refers to whether the method uses thresholding (requiring some minimum amount of the area/population to be initially graded), weighting (applying grading based on the fraction of area or population represented in the area), or centroid (assigning the grade for the area in which the centroid falls).</li>
@@ -508,6 +508,7 @@ run_holcmapr <- function(){
     observe({
       showModal(modalDialog(
         easyClose = T,
+        size = "l",
         title = HTML("<center><b>Welcome to {holcmapr}!</b></center>"),
         fluidRow(
           column(
@@ -517,7 +518,7 @@ run_holcmapr <- function(){
             # HTML('<p><img src="app_www/figures/" height = "300"></p>'),
             img(src = file.path("app_www","figures", "sfig_redlining_maps_NY.png"), align = "center", width = "100%"),
             HTML("<p>This app lets you <b>compare methods</b> for geographically mapping those redlining areas <b>for every redlined city in the US</b>. You can <b>build methods from scratch</b>, based on their attributes, or choose from <b>previously published methods</b>. You can then compare those mapping methods across several <b>different metrics</b>, including how much of the redlined area is retained by the method and how well methods perform in univariate linear models. Once you choose a method, you can <b>download the redlining values</b> for every method in your selected city for your future work.</p>"),
-            HTML("<p>For more information on what these methods are, <b>check out the tooltips</b> throughout this application and the <b>About page</b> for more detailed information. If you use this work in your research, don't forget to cite us.</p>"),
+            HTML("<p>For more information on what these methods are, <b>check out the tooltips</b> throughout this application and the <b>About page</b> for more detailed information. If you use this work in your research, don't forget to cite us by using <code>citation(\"holmapr\")</code> in your console.</p>"),
             HTML("<p><b>We hope you enjoy comparing redlining mapping methods!</b></p>")
           )
         )
