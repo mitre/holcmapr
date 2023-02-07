@@ -386,8 +386,12 @@ plot_graded_scatter <- function(city, st, intr_df,
   s_title <- if(plt_grade){"Amount Graded"} else {"HOLC Grade"}
 
   s_df <- data.frame("Area" = area_graded, "Population" = pop_graded)
-  grade_cor <- signif(
-    cor(pop_graded, area_graded, method = "pearson", use = "complete.obs"),
+  # do not compute where both are 0 -- those were never graded anyway
+  non_zero <- !(pop_graded == 0 & area_graded == 0)
+  non_zero[is.na(non_zero)] <- F
+
+  grade_rmse <- signif(
+    sqrt(mean((area_graded[non_zero] - pop_graded[non_zero])^2)),
     4
   )
 
@@ -395,7 +399,7 @@ plot_graded_scatter <- function(city, st, intr_df,
     geom_abline(slope = 1, intercept = 0, color = "#9c9c9c")+
     geom_point(color = "#9C659C")+
     theme_bw()+
-    ggtitle(paste0("Corr.: ", grade_cor),
+    ggtitle(paste0("Root Mean Squared Error (RMSE): ", grade_rmse),
             subtitle = paste0(city, ", ", st))+
     NULL
 
@@ -491,12 +495,13 @@ plot_holc_coverage <- function(city, st, ct, cb, intr_df, holc_pop, in_methods,
     geom_text(position = position_dodge(.9), aes(y = value+3))+
     geom_bar(position = position_dodge(.9), stat = "identity", alpha = .8)+
     theme_bw()+
+    coord_flip()+
     scale_y_continuous(limits = c(0, 105), expand = expansion(mult = c(0, 0)))+
     scale_fill_manual(
       values = c("Area" = "#4287f5", "Population" = "#f54242")
     )+
-    ylab("Percent Coverage")+
-    xlab("Methods")+
+    xlab("Percent Coverage")+
+    ylab("Methods")+
     ggtitle("Percent HOLC Region Covered for Specified Methods and Thresholds")+
     theme(text = element_text(size = 15),
           legend.position = "bottom",
@@ -863,3 +868,85 @@ out_lin_mod_summary <- function(cn, intr_df, which_outcome = "le"){
   return(summary(lin_mod))
 }
 
+# city attributes ----
+
+#' function to plot dominant percentage density
+#' @param type "Area" or "Population"
+#' @keywords internal
+#' @noRd
+plot_dom_perc_dens <- function(dom_perc_vect, type = "Area"){
+  if (length(dom_perc_vect) == 0){
+    return(ggplot()+theme_bw())
+  }
+
+  dom_perc <- NULL
+
+  frac.m <- data.frame(
+    "dom_perc"  = dom_perc_vect,
+    "type" = type
+  )
+  col_map <- c(
+    "Area" = "#4287f5",
+    "Population" = "#f54242"
+  )
+
+  p <- ggplot(frac.m, aes(dom_perc, fill = type, color = type))+
+    geom_density(alpha = .7)+
+    theme_bw()+
+    scale_fill_manual(values = col_map)+
+    scale_color_manual(values = col_map)+
+    xlab("Dominant Grade Percentage")+
+    ggtitle(paste0("Dominant Grade Percentage: ", type))+
+    theme(plot.title = element_text(hjust = .5),
+          legend.position = "none")+
+    scale_x_continuous(expand = c(0,0))+
+    scale_y_continuous(expand = expansion(mult = c(0,.1)))
+
+  return(p)
+}
+
+#' function to plot dominant percentage class bar plot
+#' @param type "Area" or "Population"
+#' @importFrom grDevices colorRampPalette
+#' @keywords internal
+#' @noRd
+plot_dom_perc_class <- function(dom_perc_vect, type = "Area"){
+  if (length(dom_perc_vect) == 0){
+    return(ggplot()+theme_bw())
+  }
+
+  class.m <- data.frame(
+    "class" = dom_perc_vect,
+    "type" = type
+  )
+  class.m <- class.m[complete.cases(class.m),]
+
+  col_map <- list(
+    "Area" = c("#d3e3fd", "#073e97"),
+    "Population" = c("#fdd3d3", "#960808")
+  )
+
+  pal <- rev(colorRampPalette(col_map[[type]])(length(mixed_class)))
+  names(pal) <- names(mixed_class)
+
+  p <- ggplot(class.m, aes(factor(class, levels = rev(names(mixed_class))),
+                      fill = class, color = class))+
+    geom_bar(alpha = .7)+
+    theme_bw()+
+    coord_flip()+
+    scale_y_continuous(expand = expansion(mult =  c(0,0.05)))+
+    scale_fill_manual("Class", values = pal)+
+    scale_color_manual("Class", values = pal)+
+    xlab("Mixed Class")+
+    ylab("Number of Tracts")+
+    ggtitle(paste0("Mixed Class: ", type))+
+    # ggtitle(title)+
+    theme(plot.title = element_text(hjust = .5),
+          text = element_text(size = 15),
+          legend.position = "none",
+          legend.direction = "horizontal")
+
+
+
+  return(p)
+}

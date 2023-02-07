@@ -1,4 +1,4 @@
-citHeader("To cite holcmapr in publications use both citations:")
+citHeader("To cite holcmapr in publications use citations for package and Mapping Inequality. Additionally, if using population-weighted centroid-based methods, please cite, US Census Centers of Population. Additionally, if using life expectancy results, please cite USALEEP. Additionally, if using mental or physical health results, please cite CDC PLACES. Citations for these references appear below.")
 
 citEntry(
   entry    = "Manual",
@@ -30,8 +30,6 @@ citEntry(
   textVersion = "GeoNames (2022). GeoNames Postal Code Files. Accessed: 2022-11-28. <https://download.geonames.org/export/zip/>"
 )
 
-citHeader("If using population-weighted centroid-based methods, please cite:")
-
 citEntry(
   entry    = "Misc",
   title    = "Centers of Population (2010)",
@@ -40,8 +38,6 @@ citEntry(
   url      = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html",
   textVersion = "United States Census Bureau (2010). Centers of Population (2010). Accessed: 2022-11-28. <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html>"
 )
-
-citHeader("If using life expectancy results, please cite:")
 
 citEntry(
   entry    = "Article",
@@ -55,8 +51,6 @@ citEntry(
   textVersion = paste("Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J. U.S. Small-area Life Expectancy Estimates Project: Methodology and Results Summary. National Center for Health Statistics. Vital Health Stat 2(181). 2018."
   )
 )
-
-citHeader("If using mental or physical health results, please cite:")
 
 citEntry(
   entry    = "Misc",

@@ -1,7 +1,7 @@
 Package: holcmapr
 Title: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) 
   Redlining Maps
-Version: 0.0.1
+Version: 0.1.0
 Authors@R: c(
     person("Hannah", "De los Santos", 
            email = "hdelossantos@mitre.org", 
@@ -54,4 +54,6 @@ Imports:
   sp,
   dplyr,
   colorspace,
-  methods
+  methods,
+  shinyBS,
+  bsplus

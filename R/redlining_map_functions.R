@@ -1128,8 +1128,6 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
   return(perc_coverage)
 }
 
-
-
 #' function to calculate a linear model, returns the summary
 #' outcome: asthma, mental health, physical health, life expectancy
 #' @importFrom stats complete.cases lm
@@ -1226,4 +1224,50 @@ run_lm <- function(cn, intr_df, outcome = "asthma", add_weights = F){
   } else {
     return(NA)
   }
+}
+
+# city attributes ----
+
+#' function to calculate dominant grade percentage, for city attributes
+#' @param type "exact" (return percentage) or "class" (return percentage binned by quartile)
+#' outputs: a list containing dominant grade perentage/class for area and population
+#' @keywords internal
+#' @noRd
+calc_dom_perc <- function(intr_df, type = "exact"){
+
+  # calculate fraction area graded
+  intr_df$frac_area_graded <-
+    (intr_df$total_area - intr_df$not_graded_area)/
+    intr_df$total_area
+  intr_df$frac_pop_graded <-
+    (intr_df$total_pop - intr_df$not_graded_pop)/
+    intr_df$total_pop
+  # fix 0/0
+  intr_df$frac_pop_graded[is.na(intr_df$frac_pop_graded)] <- 0
+
+  # calculate dominant grade percentage
+  # i.e. how much area/population does the dominant grade take up?
+  intr_df$dom_perc_area <-
+    apply(intr_df[,paste0(names(holc_points), "_area")], 1, max)/
+    intr_df$total_area*100
+  intr_df$dom_perc_pop <-
+    apply(intr_df[,paste0(names(holc_points), "_pop")], 1, max)/
+    intr_df$total_pop*100
+
+  if (type == "exact"){
+    ret_area <- intr_df$dom_perc_area[intr_df$frac_area_graded != 0]
+    ret_pop <- intr_df$dom_perc_pop[intr_df$frac_pop_graded != 0]
+  } else {
+    ret_area <-
+      as.character(base::cut(intr_df$dom_perc_area[intr_df$frac_area_graded != 0], mixed_class,
+                             names(mixed_class)[-1], include.lowest = T))
+    ret_pop <-
+      as.character(base::cut(intr_df$dom_perc_pop[intr_df$frac_pop_graded != 0], mixed_class,
+                             names(mixed_class)[-1], include.lowest = T))
+  }
+
+  return(list(
+    "area" = ret_area,
+    "pop" = ret_pop
+  ))
 }
