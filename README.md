@@ -105,4 +105,4 @@ The data sources used in this package are:
 
 For any questions or concerns, please contact the maintainer for this package, Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org)).
 
-©2021 The MITRE Corporation. ALL RIGHTS RESERVED.
+Approved for Public Release; Distribution Unlimited. Public Release Case Number 22-4028. ©2023 The MITRE Corporation. ALL RIGHTS RESERVED.
