@@ -51,7 +51,7 @@ get_census_dat <- function(city,st){
   if (!city %in% specific_cities){
     init_ct <- get_decennial(
       geography = "tract",  state = st, county = get_city_county(city, st),
-      year = 2010, geometry = T, variables = c("P001001", "H001001"),
+      year = 2020, geometry = T, variables = c("P1_001N", "H1_001N"),
       output = "wide"
     )
   } else {
@@ -62,13 +62,13 @@ get_census_dat <- function(city,st){
     init_ct1 <- get_decennial(
       geography = "tract",  state = spec_st[1],
       county = get_city_county(city, spec_st[1]),
-      year = 2010, geometry = T, variables = c("P001001", "H001001"),
+      year = 2020, geometry = T, variables = c("P1_001N", "H1_001N"),
       output = "wide"
     )
     init_ct2 <- get_decennial(
       geography = "tract",  state = spec_st[2],
       county = get_city_county(city, spec_st[2]),
-      year = 2010, geometry = T, variables = c("P001001", "H001001"),
+      year = 2020, geometry = T, variables = c("P1_001N", "H1_001N"),
       output = "wide"
     )
 
@@ -76,10 +76,7 @@ get_census_dat <- function(city,st){
   }
 
   # remove empty geometries since spatial types can't handle them
-  ct <- as(
-    init_ct[!st_is_empty(init_ct),],
-    "Spatial"
-  )
+  ct <- init_ct[!st_is_empty(init_ct),]
 
   return(ct)
 }
@@ -92,7 +89,7 @@ get_census_block <- function(city,st){
   if (!city %in% c("Augusta", "Greater Kansas City")){
     init_cb <- get_decennial(
       geography = "block",  state = st, county = get_city_county(city, st),
-      year = 2010, geometry = T, variables = "P001001"
+      year = 2020, geometry = T, variables = "P1_001N"
     )
   } else {
     if (city == "Greater Kansas City"){
@@ -100,36 +97,32 @@ get_census_block <- function(city,st){
       init_cb1 <- get_decennial(
         geography = "block",  state = "MO",
         county = get_city_county(city, "MO"),
-        year = 2010, geometry = T, variables = "P001001"
+        year = 2020, geometry = T, variables = "P1_001N"
       )
       init_cb2 <- get_decennial(
         geography = "block",  state = "KS",
         county = get_city_county(city, "KS"),
-        year = 2010, geometry = T, variables = "P001001"
+        year = 2020, geometry = T, variables = "P1_001N"
       )
     } else {
       # augusta is in two states
       init_cb1 <- get_decennial(
         geography = "block",  state = "GA",
         county = get_city_county(city, "GA"),
-        year = 2010, geometry = T, variables = "P001001"
+        year = 2020, geometry = T, variables = "P1_001N"
       )
       init_cb2 <- get_decennial(
         geography = "block",  state = "SC",
         county = get_city_county(city, "SC"),
-        year = 2010, geometry = T, variables = "P001001"
+        year = 2020, geometry = T, variables = "P1_001N"
       )
     }
     init_cb <- rbind(init_cb1, init_cb2)
   }
 
-  cb <- as(
-    init_cb[!st_is_empty(init_cb),],
-    "Spatial"
-  )
-
   # add the corresponding tract geoid
-  cb@data$tractFIPS <- substring(cb@data$GEOID, 1, 11)
+  cb <- init_cb
+  cb$tractFIPS <- substring(cb$GEOID, 1, 11)
 
   return(cb)
 }
@@ -137,11 +130,11 @@ get_census_block <- function(city,st){
 # function to get land and water estimates for tigris tracts
 get_tigris_tract_info <- function(city, st){
   tct <-tigris::tracts(
-    st, county = get_city_county(city, st), year = 2010, cb = F
+    st, county = get_city_county(city, st), year = 2020, cb = F
   )
 
   # keep the land, water, and geoid
-  tct <- data.frame(tct[, c("GEOID10", "ALAND10", "AWATER10")])
+  tct <- data.frame(tct[, c("GEOID", "ALAND", "AWATER")])
 
   return(tct)
 }
@@ -152,25 +145,25 @@ get_tigris_tract_info <- function(city, st){
 #' @noRd
 calc_census_area_pop <- function(city, st, ct, cb){
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
 
   # preallocate dataframe to store all the tract areas and such
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_city <- ct[ct@data$GEOID %in% ct_city@data$GEOID,]
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
+  ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
 
   km_div <- 1000*1000 # see ?area for spatialpolygon object
 
   intr_df <- data.frame(
-    "GEOID" = ct_city@data$GEOID,
-    "A_area" = rep(0, nrow(ct_city@data)),
-    "B_area" = rep(0, nrow(ct_city@data)),
-    "C_area" = rep(0, nrow(ct_city@data)),
-    "D_area" = rep(0, nrow(ct_city@data)),
-    "not_graded_area" = rep(0, nrow(ct_city@data)),
-    "total_area" = area(ct_city)/km_div
+    "GEOID" = ct_city$GEOID,
+    "A_area" = rep(0, nrow(ct_city)),
+    "B_area" = rep(0, nrow(ct_city)),
+    "C_area" = rep(0, nrow(ct_city)),
+    "D_area" = rep(0, nrow(ct_city)),
+    "not_graded_area" = rep(0, nrow(ct_city)),
+    "total_area" = st_area(ct_city)/km_div
   )
 
   # the idea is that intr_df should be populated already if we're adding
@@ -179,77 +172,73 @@ calc_census_area_pop <- function(city, st, ct, cb){
   # intersect for ease
 
   # check that holc is valid
-  holc_valid <- suppressWarnings(gIsValid(holc_sub))
-  if (!holc_valid){
+  holc_valid <- suppressWarnings(st_is_valid(holc_sub))
+  if (!all(holc_valid)){
     # we need to reproject and fix it
     proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96"
-    ct_city <- spTransform(ct_city, CRS(proj))
-    holc_sub <- spTransform(holc_sub, CRS(proj))
+    ct_city <- st_transform(ct_city, st_crs(proj))
+    holc_sub <- st_transform(holc_sub, st_crs(proj))
     # then add a 0 width buffer
-    holc_sub <- gBuffer(holc_sub, byid=TRUE, width=0)
+    holc_sub <- st_buffer(holc_sub, 0)
   }
 
-  ct_city_inter <- intersect(ct_city, holc_sub)
+  ct_city_inter <- st_intersection(ct_city, holc_sub)
 
   # subset to only the tracts we know intersect with a holc grade
-  cb_city <- cb[cb@data$tractFIPS %in% unique(ct_city_inter$GEOID),]
+  cb_city <- cb[cb$tractFIPS %in% unique(ct_city_inter$GEOID),]
 
-  if (!holc_valid){
-    cb_city <- spTransform(cb_city, CRS(proj))
+  if (!all(holc_valid)){
+    cb_city <- st_transform(cb_city, CRS(proj))
   }
 
   # add the census block areas
-  cb_city@data$area <- area(cb_city)/(1000*1000) # area in km^2
+  cb_city$area <- st_area(cb_city)/(1000*1000) # area in km^2
 
   # preallocate population metrics
   intr_df <- cbind(
     intr_df,
     data.frame(
-      "A_pop" = rep(0, nrow(ct_city@data)),
-      "B_pop" = rep(0, nrow(ct_city@data)),
-      "C_pop" = rep(0, nrow(ct_city@data)),
-      "D_pop" = rep(0, nrow(ct_city@data)),
-      "not_graded_pop" = rep(0, nrow(ct_city@data)),
-      "total_pop" = rep(0, nrow(ct_city@data))
+      "A_pop" = rep(0, nrow(ct_city)),
+      "B_pop" = rep(0, nrow(ct_city)),
+      "C_pop" = rep(0, nrow(ct_city)),
+      "D_pop" = rep(0, nrow(ct_city)),
+      "not_graded_pop" = rep(0, nrow(ct_city)),
+      "total_pop" = rep(0, nrow(ct_city))
     )
   )
 
   # go through all the city data
-  for (p in 1:nrow(ct_city@data)){
+  for (p in 1:nrow(ct_city)){
     tryCatch({
       # assign by area
       # if (!add_pop){
-      tmp <- intersect(ct_city[p,], holc_sub)
+      tmp <- st_intersection(ct_city[p,], holc_sub)
       for (i in names(holc_points)){
-        logi <- tmp@data$holc_grade == i
+        logi <- tmp$grade == i
         if (sum(logi) > 0){
-          intr_df[p, paste0(i,"_area")] <- sum(area(tmp[logi,])/km_div)
+          intr_df[p, paste0(i,"_area")] <- sum(st_area(tmp[logi,])/km_div)
         }
       }
-      # } else {
       # assign by block population
-      tmp2 <- intersect(cb_city[cb_city$tractFIPS %in% ct_city$GEOID[p],],holc_sub)
+      tmp2 <- st_intersection(cb_city[cb_city$tractFIPS %in% ct_city$GEOID[p],],holc_sub)
       # add total population
       intr_df$total_pop[p] <- sum(
-        cb_city@data$value[cb_city$tractFIPS %in% ct_city$GEOID[p]]
+        cb_city$value[cb_city$tractFIPS %in% ct_city$GEOID[p]]
       )
 
       for (i in names(holc_points)){
-        logi <- tmp2@data$holc_grade == i
+        logi <- tmp2$grade == i
         if (sum(logi) > 0){
           # what fraction of the block is covered, has that amount of people
           intr_df[p, paste0(i,"_pop")] <- sum(
-            (area(tmp2[logi,])/km_div)/tmp2@data$area[logi]*
-              tmp2@data$value[logi]
+            (st_area(tmp2[logi,])/km_div)/tmp2$area[logi]*
+              tmp2$value[logi]
           )
         }
       }
       # }
     },
     error = function(cond){
-      # print(paste(p, "no intersection"))
-    },
-    warning = function(cond){
       # print(paste(p, "no intersection"))
     })
   }
@@ -259,12 +248,14 @@ calc_census_area_pop <- function(city, st, ct, cb){
   # now compute the amount that is not graded
   sum_graded_area <- rowSums(intr_df[,paste0(names(holc_points), "_area")])
   intr_df$not_graded_area <-
-    intr_df$total_area - sum_graded_area
+    as.numeric(intr_df$total_area) - sum_graded_area
 
   # also compute population not graded
   sum_graded_pop <- rowSums(intr_df[,paste0(names(holc_points), "_pop")])
   intr_df$not_graded_pop <-
-    intr_df$total_pop - sum_graded_pop
+    as.numeric(intr_df$total_pop) - sum_graded_pop
+
+  intr_df$total_area <- as.numeric(intr_df$total_area)
 
   return(intr_df)
 }
@@ -277,15 +268,15 @@ test_assignment <- function(city, st, ct, cb,
                             in_methods, c_area_pop){
   # subset holc data to the city and state
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
   orig_holc_sub <- holc_sub
 
   # preallocate dataframe to store all the tract areas and such
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_city <- ct[ct@data$GEOID %in% ct_city@data$GEOID,]
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
+  ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
 
   km_div <- 1000*1000 # see ?area for spatialpolygon object
   intr_df <- c_area_pop
@@ -293,59 +284,59 @@ test_assignment <- function(city, st, ct, cb,
   if (any(grepl("_pop", in_methods))){
     # intersect for ease
     # check that holc is valid
-    holc_valid <- suppressWarnings(gIsValid(holc_sub))
-    if (!holc_valid){
+    holc_valid <- suppressWarnings(st_is_valid(holc_sub))
+    if (!all(holc_valid)){
       # we need to reproject and fix it
       proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96"
-      ct_city <- spTransform(ct_city, CRS(proj))
-      holc_sub <- spTransform(holc_sub, CRS(proj))
+      ct_city <- st_transform(ct_city, st_crs(proj))
+      holc_sub <- st_transform(holc_sub, st_crs(proj))
       # then add a 0 width buffer
-      holc_sub <- gBuffer(holc_sub, byid=TRUE, width=0)
+      holc_sub <- st_buffer(holc_sub, 0)
     }
 
-    ct_city_inter <- intersect(ct_city, holc_sub)
+    ct_city_inter <- st_intersection(ct_city, holc_sub)
 
     # subset to only the tracts we know intersect with a holc grade
-    cb_city <- cb[cb@data$tractFIPS %in% unique(ct_city_inter$GEOID),]
+    cb_city <- cb[cb$tractFIPS %in% unique(ct_city_inter$GEOID),]
 
-    if (!holc_valid){
-      cb_city <- spTransform(cb_city, CRS(proj))
+    if (!all(holc_valid)){
+      cb_city <- st_transform(cb_city, CRS(proj))
     }
 
     # add the census block areas
-    cb_city@data$area <- area(cb_city)/(1000*1000) # area in km^2
+    cb_city$area <- st_area(cb_city)/(1000*1000) # area in km^2
   }
 
   # unweighted centroids ----
 
   if ("unw_centroid" %in% in_methods){
-    unw_centr_pt <- gCentroid(
-      ct_city[,],
-      byid = T)
+    unw_centr_pt <- st_centroid(ct_city)
 
     # find out which points fall in holc areas and their grades
-    unw_overlap <- over(unw_centr_pt, holc_sub)
-    intr_df$unw_centroid <- unw_overlap$holc_grade
-    intr_df$unw_centroid_long <- unw_centr_pt@coords[,1]
-    intr_df$unw_centroid_lat <- unw_centr_pt@coords[,2]
+    unw_overlap <- st_intersection(unw_centr_pt, holc_sub)
+
+    rownames(intr_df) <- intr_df$GEOID
+    intr_df[unw_overlap$GEOID, "unw_centroid"] <- unw_overlap$grade
+    intr_df[unw_overlap$GEOID, "unw_centroid_long"] <- st_coordinates(unw_overlap)[,1]
+    intr_df[unw_overlap$GEOID, "unw_centroid_lat"] <- st_coordinates(unw_overlap)[,2]
   }
 
   # weighted centroids ----
   # note: not available through tidycensus, so I'm not making them available
   # for all states -- just example states
   if ("w_centroid" %in% in_methods){
-    centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city@data$GEOID,]
+    centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city$GEOID,]
 
-    w_pts <- SpatialPoints(centr_pop_city[,c("LONGITUDE", "LATITUDE")],
-                           proj4string = ct@proj4string)
-    w_overlap <- over(w_pts, orig_holc_sub)
+    w_pts <- st_as_sf(centr_pop_city, coords = c("LONGITUDE", "LATITUDE"),
+                      crs = st_crs(ct), agr = "constant")
+    w_overlap <- st_intersection(w_pts, orig_holc_sub)
     rownames(intr_df) <- intr_df$GEOID
-    intr_df[as.character(centr_pop_city$GEOID), "w_centroid"] <-
-      w_overlap$holc_grade
-    intr_df[as.character(centr_pop_city$GEOID), "w_centroid_long"] <-
-      w_pts@coords[,1]
-    intr_df[as.character(centr_pop_city$GEOID), "w_centroid_lat"] <-
-      w_pts@coords[,2]
+    intr_df[as.character(w_overlap$GEOID), "w_centroid"] <-
+      w_overlap$grade
+    intr_df[as.character(w_overlap$GEOID), "w_centroid_long"] <-
+      st_coordinates(w_overlap)[,1]
+    intr_df[as.character(w_overlap$GEOID), "w_centroid_lat"] <-
+      st_coordinates(w_overlap)[,2]
   }
   # continuous-based measures ----
 
@@ -418,9 +409,9 @@ test_assignment <- function(city, st, ct, cb,
       intr_df$crossney <- rowSums(sweep(intr_df[,paste0(names(holc_points), "_area")], MARGIN = 2, holc_points, `*`))/sum_graded_area
       # filter out < 250 people or | < 250 households (adjusted for 2020)
       res_df <- data.frame(
-        "GEOID" = ct@data$GEOID,
-        "housing_units" = ct@data$H001001,
-        "pop" = ct@data$P001001
+        "GEOID" = ct$GEOID,
+        "housing_units" = ct$H1_001N,
+        "pop" = ct$P1_001N
       )
       rownames(res_df) <- res_df$GEOID
 
@@ -445,9 +436,9 @@ test_assignment <- function(city, st, ct, cb,
         ]
 
       # calculate the how much the winning area takes up (subracting water)
-      # get water
-      water <- ct@data$AWATER10/km_div
-      names(water) <- ct@data$GEOID
+      # get water STOP
+      water <- ct$AWATER/km_div
+      names(water) <- ct$GEOID
       area_prop <-
         sapply(1:nrow(intr_df), function(x){
           intr_df[x,paste0(intr_df$krieger[x], "_area")]/(
@@ -612,15 +603,15 @@ add_threshold <- function(intr_df, in_methods){
 #' @noRd
 get_width <- function(city, st, height){
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  bb <- bbox(holc_sub)
+  bb <- st_bbox(holc_sub)
 
-  diff_y <- diff(bb[2,])
-  diff_x <- diff(bb[1,])
+  diff_y <- abs(bb$ymax - bb$ymin)
+  diff_x <- abs(bb$xmax - bb$xmin)
 
-  return(ceiling(diff_x/diff_y*height))
+  return(unname(ceiling(diff_x/diff_y*height)))
 }
 
 #' function to figure out threshold based on density plot
@@ -682,26 +673,29 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
     intr_df$frac_graded[is.na(intr_df$frac_graded)] <- 0
   }
 
+  # subset holc data to the city and state
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
   orig_holc_sub <- holc_sub
 
+  # STOP HERE
+
   # preallocate dataframe to store all the tract areas and such
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_city <- ct[ct@data$GEOID %in% ct_city@data$GEOID,]
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
+  ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
 
   # check that holc is valid
-  holc_valid <- suppressWarnings(gIsValid(holc_sub))
-  if (!holc_valid){
+  holc_valid <- suppressWarnings(st_is_valid(holc_sub))
+  if (!all(holc_valid)){
     # we need to reproject and fix it
     proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96"
-    ct_city <- spTransform(ct_city, CRS(proj))
-    holc_sub <- spTransform(holc_sub, CRS(proj))
+    ct_city <- st_transform(ct_city, st_crs(proj))
+    holc_sub <- st_transform(holc_sub, st_crs(proj))
     # then add a 0 width buffer
-    holc_sub <- gBuffer(holc_sub, byid=TRUE, width=0)
+    holc_sub <- st_buffer(holc_sub, 0)
   }
 
   if (cn == "unw_centroid"){
