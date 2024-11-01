@@ -12,11 +12,8 @@
   data_folder <- system.file("extdata", package = "holcmapr")
   assign("data_folder", data_folder, envir = topenv())
 
-  # load HOLC data -- much faster to load it from RData
-  # holc_dat <- readOGR(
-  #   file.path(data_folder, "Redlining", "redlining_fullshpfile", "HOLC_Cities.gdb"),
-  #   "holc_ad_data")
-  load(file.path(data_folder, "HOLC_shpfile.RData"))
+  holc_dat <- sf::st_read(
+    file.path(data_folder, "mappinginequality.json"))
   # will result in holc_dat
   assign("holc_dat", holc_dat, envir = topenv())
 
@@ -32,7 +29,7 @@
   # load centroids
   centr_pop <- read.csv(
     file.path(
-      data_folder,"CenPop2010_Means", "CenPop2010_Mean_US.csv"
+      data_folder, "CenPop2020_Mean_TR.csv"
     ),
     colClasses = c(rep("character",3), rep("numeric",3))
   )
@@ -46,7 +43,7 @@
   # load PLACES data (for health outcome data)
   places_df <- read.csv(
     file.path(data_folder, "PLACES", "CT",
-              "PLACES__Census_Tract_Data__GIS_Friendly_Format___2020_release.csv"),
+              "PLACES__Census_Tract_Data__GIS_Friendly_Format___2024_release.csv"),
     colClasses = c("TractFIPS" = "character")
   )
   rownames(places_df) <- places_df$TractFIPS
