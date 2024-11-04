@@ -9,25 +9,22 @@
 #' @keywords internal
 #' @noRd
 plot_HOLC_area <- function(city, st){
-  long <- lat <- group <- holc_grade <- NULL
+  grade <- NULL
 
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
 
-  hd_plot <- tidy(holc_sub, region = "neighborho")
-  hd_plot <- base::merge(hd_plot, holc_sub@data, by.x = "id", by.y = "neighborho", all.x = T)
+  hd_plot <- holc_sub
 
   ggplot()+
-    geom_polygon(data = hd_plot, aes(long, lat, group = group, fill = holc_grade),
-                 alpha = .7)+
-    geom_path(data = hd_plot, aes(long, lat, group = group))+
+    geom_sf(data = hd_plot, aes(fill = grade))+
+    coord_sf(datum=st_crs(3857),
+             xlim = st_bbox(holc_sub)[c(1,3)],
+             ylim = st_bbox(holc_sub)[c(2,4)])+
     scale_fill_manual("HOLC Grades", values = holc_colors)+
     theme_bw()+
-    coord_cartesian(xlim = bbox(holc_sub)[1,],
-                    ylim = bbox(holc_sub)[2,],
-                    expand = F)+
     xlab("Longitude")+
     ylab("Latitude")+
     ggtitle("HOLC Grades",
@@ -42,30 +39,25 @@ plot_HOLC_area <- function(city, st){
 #' @keywords internal
 #' @noRd
 plot_census_map_overlay <- function(city, st, ct){
-  long <- lat <- group <- holc_grade <- NULL
+  grade <- NULL
 
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
 
-  hd_plot <- tidy(holc_sub, region = "neighborho")
-  hd_plot <- base::merge(hd_plot, holc_sub@data, by.x = "id", by.y = "neighborho", all.x = T)
+  hd_plot <- holc_sub
 
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_plot <- tidy(ct_city, region = "GEOID")
-  ct_plot <- base::merge(ct_plot, ct_city@data, by.x = "id", by.y = "GEOID",
-                         all.x = T)
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
 
   ggplot()+
-    geom_polygon(data = hd_plot,
-                 aes(long, lat, group = group, fill = holc_grade),
-                 alpha = .7)+
-    geom_path(data = ct_plot, aes(long, lat, group = group), alpha = .7)+
+    geom_sf(data = hd_plot, aes(fill = grade), color = NA, alpha = .7)+
+    geom_sf(data = ct_city, fill = NA, alpha = .7)+
     scale_fill_manual("HOLC Grade", values = holc_colors)+
     theme_bw()+
-    coord_quickmap(xlim = bbox(holc_sub)[1,],
-                   ylim = bbox(holc_sub)[2,],
+    coord_sf( xlim = st_bbox(holc_sub)[c(1,3)],
+                   ylim = st_bbox(holc_sub)[c(2,4)],
                    expand = F)+
     xlab("Longitude")+
     ylab("Latitude")+
@@ -80,28 +72,27 @@ plot_census_map_overlay <- function(city, st, ct){
 #' @keywords internal
 #' @noRd
 plot_census_block_pop <- function(cb, city, st){
-  long <- lat <- group <- value <- NULL
 
+  long <- lat <- group <- value <- NULL
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  cb_city <- crop(cb, bbox(holc_sub))
-  cb_plot <- tidy(cb_city, region = "GEOID")
-  cb_plot <- base::merge(cb_plot, cb_city@data, by.x = "id", by.y = "GEOID",
-                         all.x = T)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
+
+  hd_plot <- holc_sub
+
+  cb_city <- st_crop(cb, st_bbox(holc_sub))
 
   ggplot()+
-    geom_polygon(data = cb_plot,
-                 aes(long, lat, group = group, fill = (value)),
-                 alpha = .7)+
-    geom_path(data = cb_plot, aes(long, lat, group = group), alpha = .7)+
+    geom_sf(data = hd_plot, aes(fill = grade), color = NA, alpha = .7)+
+    geom_sf(data = cb_city, fill = NA, alpha = .7)++
     theme_bw()+
     scale_fill_gradient(low = "#cccccc",
                         high = "#ba0000")+
-    coord_cartesian(xlim = bbox(holc_sub)[1,],
-                    ylim = bbox(holc_sub)[2,],
-                    expand = F)+
+    coord_sf( xlim = st_bbox(holc_sub)[c(1,3)],
+              ylim = st_bbox(holc_sub)[c(2,4)],
+              expand = F)+
     xlab("Longitude")+
     ylab("Latitude")+
     ggtitle("Census Tracts with HOLC Grade Overlay",
@@ -151,44 +142,46 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
   }
 
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
 
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_plot <- tidy(ct_city, region = "GEOID")
-  ct_plot <- base::merge(ct_plot, ct_city@data, by.x = "id", by.y = "GEOID",
-                         all.x = T)
+  hd_plot <- holc_sub
+
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
 
   # we want to add them as points, so we need the centroids
   if (add_outcome){
-    unw_centr_pt <- gCentroid(
-      ct_city[,],
-      byid = T)
+    unw_centr_pt <- st_centroid(ct_city)
 
     # find out which points fall in holc areas and their grades
-    intr_df$unw_centroid_long <- unw_centr_pt@coords[,1]
-    intr_df$unw_centroid_lat <- unw_centr_pt@coords[,2]
+    unw_overlap <- st_intersection(unw_centr_pt, holc_sub)
+
+    rownames(intr_df) <- intr_df$GEOID
+    intr_df[unw_overlap$GEOID, "unw_centroid"] <- unw_overlap$grade
+    intr_df[unw_overlap$GEOID, "unw_centroid_long"] <- st_coordinates(unw_overlap)[,1]
+    intr_df[unw_overlap$GEOID, "unw_centroid_lat"] <- st_coordinates(unw_overlap)[,2]
   }
 
-  ct_class <- base::merge(ct_plot,
+  ct_class <- base::merge(ct_city,
                           intr_df,
-                          by.x = "id",
-                          by.y = "GEOID",
+                          by = "GEOID",
                           all.x = T,
                           sort = F)
   # merge messes up order for some reason
-  ct_class <- ct_class[order(ct_class$id,ct_class$order),]
+  ct_class <- ct_class[order(ct_class$GEOID),]
 
   # plot classification by unweighted centroid
   p <- ggplot()
 
   if (add_opacity){
     p <- p +
-      geom_polygon(data = ct_class,
-                   aes_string("long", "lat", group = "group", fill = cn,
-                              alpha = "frac_graded"))+
+      geom_sf(data = ct_class, aes(fill =  .data[[cn]], alpha = frac_graded))+
+
+      # geom_polygon(data = ct_class,
+      #              aes_string("long", "lat", group = "group", fill = cn,
+      #                         alpha = "frac_graded"))+
       if (!grepl("_pop", cn)){
         scale_alpha("Frac. Area Graded", range = c(0,1))
       } else {
@@ -196,19 +189,15 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
       }
   } else {
     p <- p +
-      geom_polygon(data = ct_class,
-                   aes_string("long", "lat", group = "group", fill = cn),
+      geom_sf(data = ct_class, aes(fill =  .data[[cn]]),
                    alpha = .7)
   }
 
   p <- p +
-    geom_path(data = ct_plot,
-              aes(long, lat, group = group))+
-    # scale_fill_manual(values = holc_colors)+
     theme_bw()+
-    coord_quickmap(xlim = bbox(holc_sub)[1,],
-                   ylim = bbox(holc_sub)[2,],
-                   expand = F)+
+    coord_sf( xlim = st_bbox(holc_sub)[c(1,3)],
+              ylim = st_bbox(holc_sub)[c(2,4)],
+              expand = F)+
     xlab("Longitude")+
     ylab("Latitude")+
     theme(legend.position = "bottom",
@@ -684,16 +673,18 @@ plot_assignment_diff <- function(city, st, ct, cn1, cn2, intr_df){
     return(ggplot()+theme_bw())
   }
 
+  # subset holc data to the city and state
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
+  orig_holc_sub <- holc_sub
 
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_plot <- tidy(ct_city, region = "GEOID")
-  ct_plot <- base::merge(ct_plot, ct_city@data, by.x = "id", by.y = "GEOID",
-                         all.x = T)
+  # preallocate dataframe to store all the tract areas and such
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
+  ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
+  ct_plot <- ct_city
 
 
   # convert assignment types
@@ -711,8 +702,7 @@ plot_assignment_diff <- function(city, st, ct, cn1, cn2, intr_df){
 
   ct_class <- base::merge(ct_plot,
                           intr_df,
-                          by.x = "id",
-                          by.y = "GEOID",
+                          by = "GEOID",
                           all.x = T,
                           sort = F)
   # merge messes up order for some reason
@@ -720,16 +710,13 @@ plot_assignment_diff <- function(city, st, ct, cn1, cn2, intr_df){
 
   # plot classification by unweighted centroid
   p <- ggplot() +
-    geom_polygon(data = ct_class,
-                 aes_string("long", "lat", group = "group", fill = "diff_cn"),
-                 alpha = .7) +
-    geom_path(data = ct_class,
-              aes(long, lat, group = group, color = diff_cn))+
+    geom_sf(data = ct_class, aes(fill =  diff_cn),
+            alpha = .7)+
     # scale_fill_manual(values = holc_colors)+
     theme_bw()+
-    coord_quickmap(xlim = bbox(holc_sub)[1,],
-                   ylim = bbox(holc_sub)[2,],
-                   expand = F)+
+    coord_sf( xlim = st_bbox(holc_sub)[c(1,3)],
+              ylim = st_bbox(holc_sub)[c(2,4)],
+              expand = F)+
     xlab("Longitude")+
     ylab("Latitude")+
     theme(legend.position = "bottom",
