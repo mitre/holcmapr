@@ -14,12 +14,32 @@
 
   holc_dat <- sf::st_read(
     file.path(data_folder, "mappinginequality.json"))
+  # only keep cities that have been graded by HOLC
+  holc_dat <- holc_dat[!is.na(holc_dat$grade) & holc_dat$grade != "",]
+  # label neighborhoods that have no labels
+  for (cts in unique(paste0(holc_dat$city, "/", holc_dat$state))){
+    city <- strsplit(cts, "/")[[1]][1]
+    st <- strsplit(cts, "/")[[1]][2]
+
+    holc_sub <- holc_dat[
+      holc_dat$city == city & holc_dat$state == st
+      ,]
+
+    if (any(" " %in% holc_sub$label)){
+      holc_sub$label[holc_sub$label == " "] <- paste0("ZZ", 1:sum(holc_sub$label == " "))
+    }
+
+    holc_dat[
+      holc_dat$city == city & holc_dat$state == st
+      , "label"] <- holc_sub$label
+
+  }
   # will result in holc_dat
   assign("holc_dat", holc_dat, envir = topenv())
 
 
   # load us cities data (for mapping to counties for easy census download)
-  us_cities <- read.csv(file.path(data_folder, "US_cities.csv"))
+  us_cities <- read.csv(file.path(data_folder, "All_US_cities.csv"))
   # also load specific city mappings
   specific_us_cities <- read.csv(file.path(data_folder, "Specific_US_cities.csv"))
 

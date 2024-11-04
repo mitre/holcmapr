@@ -188,7 +188,7 @@ calc_census_area_pop <- function(city, st, ct, cb){
   cb_city <- cb[cb$tractFIPS %in% unique(ct_city_inter$GEOID),]
 
   if (!all(holc_valid)){
-    cb_city <- st_transform(cb_city, CRS(proj))
+    cb_city <- st_transform(cb_city, st_crs(proj))
   }
 
   # add the census block areas
@@ -300,7 +300,7 @@ test_assignment <- function(city, st, ct, cb,
     cb_city <- cb[cb$tractFIPS %in% unique(ct_city_inter$GEOID),]
 
     if (!all(holc_valid)){
-      cb_city <- st_transform(cb_city, CRS(proj))
+      cb_city <- st_transform(cb_city, st_crs(proj))
     }
 
     # add the census block areas
@@ -681,8 +681,6 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
   holc_sub <- st_transform(holc_sub, st_crs(ct))
   orig_holc_sub <- holc_sub
 
-  # STOP HERE
-
   # preallocate dataframe to store all the tract areas and such
   ct_city <- st_crop(ct, st_bbox(holc_sub))
   ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
@@ -700,79 +698,65 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
 
   if (cn == "unw_centroid"){
     # calculate tract centers
-    unw_centr_pt <- gCentroid(
-      ct_city[,],
-      byid = T)
+    unw_centr_pt <- st_centroid(ct_city)
 
     # find out which points fall in holc areas and their grades
-    unw_overlap <- over(unw_centr_pt, holc_sub)
+    unw_overlap <- st_intersection(unw_centr_pt, holc_sub)
 
     # now get the areas that overlap
-    total_coverage <- sapply(1:nrow(unw_overlap), function(x){
-      if (!is.na(unw_overlap$holc_id[x])){
-        tmp <- intersect(
+    total_coverage <-  unlist(suppressMessages(sapply(1:nrow(unw_overlap), function(x){
+      if (!is.na(unw_overlap$label[x])){
+        tmp <- st_intersection(
           ct_city[x,],
-          holc_sub[holc_sub@data$neighborho == unw_overlap$neighborho[x],])
+          holc_sub[holc_sub$label == unw_overlap$label[x],])
 
         if (!is.null(tmp)){
-          return(area(tmp))
+          return(st_area(tmp))
         } else {
           return(0)
         }
       } else {
         return(0)
       }
-    })
+    })))
 
     if (!add_penalty){
-      perc_coverage <- sum(total_coverage)/sum(area(holc_sub))
+      perc_coverage <- as.numeric(sum(total_coverage)/sum(st_area(holc_sub)))
     } else {
       # get the penalty
       rownames(intr_df) <- intr_df$GEOID
       penalty <-
-        intr_df[ct_city@data$GEOID, "not_graded_area"] * pen_wt
+        intr_df[ct_city$GEOID, "not_graded_area"] * pen_wt
       penalty[total_coverage == 0] <- 0
 
       perc_coverage <-
         # good
-        sum(total_coverage)/sum(area(holc_sub)) -
+        as.numeric(sum(total_coverage)/sum(st_area(holc_sub))) -
         # penalty -- don't county tracts that weren't included
         sum(penalty)/sum(intr_df$total_area[penalty != 0])
     }
   } else if (cn == "w_centroid") {
-    # load the data
-    # centr_pop <- read.csv(
-    #   file.path(
-    #     data_folder,"CenPop2010_Means", paste0("CenPop2010_Mean_",st,".csv")
-    #   ),
-    #   colClasses = c(rep("character",3), rep("numeric",3))
-    # )
-    # centr_pop$GEOID <- paste0(
-    #   centr_pop$STATEFP,
-    #   centr_pop$COUNTYFP,
-    #   centr_pop$TRACTCE
-    # )
-    centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city@data$GEOID,]
+    centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city$GEOID,]
 
-    w_pts <- SpatialPoints(centr_pop_city[,c("LONGITUDE", "LATITUDE")],
-                           proj4string = ct@proj4string)
-    w_overlap <- over(w_pts, orig_holc_sub)
+    w_pts <- st_as_sf(centr_pop_city, coords = c("LONGITUDE", "LATITUDE"),
+                      crs = st_crs(ct), agr = "constant")
+    w_overlap <- st_intersection(w_pts, orig_holc_sub)
 
     # now get the areas that overlap
-    total_coverage <- sapply(1:nrow(w_overlap), function(x){
-      if (!is.na(w_overlap$holc_id[x])){
-        tmp <- intersect(
-          ct_city[ct_city@data$GEOID == centr_pop_city$GEOID[x],],
-          holc_sub[holc_sub@data$neighborho == w_overlap$neighborho[x],])
+    total_coverage <-  unlist(suppressMessages(sapply(1:nrow(w_overlap), function(x){
+      if (!is.na(w_overlap$label[x])){
+        tmp <- st_intersection(
+          ct_city[ct_city$GEOID == centr_pop_city$GEOID[x],],
+          holc_sub[holc_sub$label == w_overlap$label[x],])
 
-        return(area(tmp))
+        return(st_area(tmp))
       } else {
         return(0)
       }
-    })
+    })))
 
     if (!add_penalty){
-      perc_coverage <- sum(total_coverage)/sum(area(holc_sub))
+      perc_coverage <- as.numeric(sum(total_coverage)/sum(st_area(holc_sub)))
     } else {
       # get the penalty
       rownames(intr_df) <- intr_df$GEOID
@@ -782,7 +766,7 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
 
       perc_coverage <-
         # good
-        sum(total_coverage)/sum(area(holc_sub)) -
+        as.numeric(sum(total_coverage)/sum(st_area(holc_sub))) -
         # penalty -- don't county tracts that weren't included
         sum(penalty)/sum(intr_df$total_area[penalty != 0])
     }
@@ -808,11 +792,11 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
       } else {1}
 
     if (!add_penalty){
-      perc_coverage <- sum(sum_graded_area*wts)/sum(area(holc_sub)/1000/1000)
+      perc_coverage <- sum(sum_graded_area*wts)/as.numeric(sum(st_area(holc_sub)/1000/1000))
     } else {
       perc_coverage <-
         # good
-        sum(sum_graded_area*wts)/sum(area(holc_sub)/1000/1000) -
+        sum(sum_graded_area*wts)/as.numeric(sum(st_area(holc_sub)/1000/1000)) -
         # penalty -- don't county tracts that weren't included
         sum(penalty*wts)/sum(intr_df$total_area[penalty != 0])
     }
@@ -832,11 +816,11 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
       } else {1}
 
     if (!add_penalty){
-      perc_coverage <- sum(sum_graded_area*wts)/sum(area(holc_sub)/1000/1000)
+      perc_coverage <- sum(sum_graded_area*wts)/as.numeric(sum(st_area(holc_sub)/1000/1000))
     } else {
       perc_coverage <-
         # good
-        sum(sum_graded_area*wts)/sum(area(holc_sub)/1000/1000) -
+        sum(sum_graded_area*wts)/as.numeric(sum(st_area(holc_sub)/1000/1000)) -
         # penalty -- don't county tracts that weren't included
         sum(penalty*wts)/sum(intr_df$total_area[penalty != 0])
     }
@@ -851,73 +835,66 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
 #' @noRd
 calc_holc_pop <- function(city, st, ct, cb){
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
 
-  # preallocate dataframe to store all the tract area/pop and such
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_city <- ct[ct@data$GEOID %in% ct_city@data$GEOID,]
+  # preallocate dataframe to store all the tract areas and such
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
+  ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
+
 
   # check that holc is valid
-  holc_valid <- suppressWarnings(gIsValid(holc_sub))
-  if (!holc_valid){
+  holc_valid <- suppressWarnings(st_is_valid(holc_sub))
+  if (!all(holc_valid)){
     # we need to reproject and fix it
     proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96"
-    ct_city <- spTransform(ct_city, CRS(proj))
-    holc_sub <- spTransform(holc_sub, CRS(proj))
+    ct_city <- st_transform(ct_city, st_crs(proj))
+    holc_sub <- st_transform(holc_sub, st_crs(proj))
     # then add a 0 width buffer
-    holc_sub <- gBuffer(holc_sub, byid=TRUE, width=0)
+    holc_sub <- st_buffer(holc_sub, 0)
   }
 
-  # intersect for ease
-  ct_city_inter <- intersect(ct_city, holc_sub)
+  ct_city_inter <- st_intersection(ct_city, holc_sub)
 
   # subset to only the tracts we know intersect with a holc grade
-  cb_city <- cb[cb@data$tractFIPS %in% unique(ct_city_inter$GEOID),]
+  cb_city <- cb[cb$tractFIPS %in% unique(ct_city_inter$GEOID),]
 
-  if (!holc_valid){
-    cb_city <- spTransform(cb_city, CRS(proj))
+  if (!all(holc_valid)){
+    cb_city <- st_transform(cb_city, st_crs(proj))
   }
 
+
   # add the census block areas
-  cb_city@data$area <- area(cb_city)/(1000*1000) # area in km^2
+  cb_city$area <- st_area(cb_city)/(1000*1000) # area in km^2
 
   # testing
 
   all_pop <-
     # sapply
-    sapply(1:nrow(holc_sub), function(i){
+    supressMessages(sapply(1:nrow(holc_sub), function(i){
       # only intersect with tracts where we know it will be
-      holc_pop <- intersect(
+      holc_pop <- st_intersection(
         holc_sub[i,],
         cb_city[cb_city$tractFIPS %in%
-                  ct_city_inter$GEOID[ct_city_inter$holc_id ==
-                                        holc_sub$holc_id[i]],])
+                  ct_city_inter$GEOID[ct_city_inter$label ==
+                                        holc_sub$label[i]],])
+
+      sf_use_s2(FALSE)
 
       given_pop <- sum(
-        (area(holc_pop)/1000/1000)/
-          holc_pop@data[,"area"]*
-          holc_pop@data[,"value"]
+        (as.numeric(st_area(holc_pop))/1000/1000)/
+          as.numeric(st_drop_geometry(holc_pop[,"area"])[,1])*
+          st_drop_geometry(holc_pop[,"value"])[,1]
       )
 
-      return(given_pop)
-    })
-  # # sapply
-  # sapply(1:nrow(holc_sub), function(i){
-  #   holc_pop <- intersect(holc_sub[i,], ct_city)
-  #
-  #   given_pop <- sum(
-  #     (area(holc_pop)/1000/1000)/
-  #       holc_pop@data[,"area"]*
-  #       holc_pop@data[,"value"]
-  #   )
-  #
-  #   return(given_pop)
-  # })
+      sf_use_s2(TRUE)
 
-  names(all_pop) <- holc_sub$neighborho
+      return(given_pop)
+    }))
+
+  names(all_pop) <- holc_sub$label
 
   return(all_pop)
 }
@@ -948,50 +925,48 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
     intr_df$frac_graded[is.na(intr_df$frac_graded)] <- 0
   }
 
+  # subset holc data to the city and state
   holc_sub <- holc_dat[
-    holc_dat@data$city == city & holc_dat@data$state == st &
-      holc_dat@data$holc_grade != "E"
+    holc_dat$city == city & holc_dat$state == st &
+      holc_dat$grade != "E"
     ,]
-  holc_sub <- spTransform(holc_sub, CRSobj = ct@proj4string)
+  holc_sub <- st_transform(holc_sub, st_crs(ct))
   orig_holc_sub <- holc_sub
 
-  # preallocate dataframe to store all the tract area/pop and such
-  ct_city <- crop(ct, bbox(holc_sub))
-  ct_city <- ct[ct@data$GEOID %in% ct_city@data$GEOID,]
+  # preallocate dataframe to store all the tract areas and such
+  ct_city <- st_crop(ct, st_bbox(holc_sub))
+  ct_city <- ct[ct$GEOID %in% ct_city$GEOID,]
 
-  # check that holc is valid
-  holc_valid <- suppressWarnings(gIsValid(holc_sub))
-  if (!holc_valid){
+
+  holc_valid <- suppressWarnings(st_is_valid(holc_sub))
+  if (!all(holc_valid)){
     # we need to reproject and fix it
     proj <- "+proj=aea +lat_1=29.5 +lat_2=45.5 +lat_0=37.5 +lon_0=-96"
-    ct_city <- spTransform(ct_city, CRS(proj))
-    holc_sub <- spTransform(holc_sub, CRS(proj))
+    ct_city <- st_transform(ct_city, st_crs(proj))
+    holc_sub <- st_transform(holc_sub, st_crs(proj))
     # then add a 0 width buffer
-    holc_sub <- gBuffer(holc_sub, byid=TRUE, width=0)
+    holc_sub <- st_buffer(holc_sub, 0)
   }
 
   if (cn == "unw_centroid"){
-    # calculate tract centers
-    unw_centr_pt <- gCentroid(
-      ct_city[,],
-      byid = T)
+    unw_centr_pt <- st_centroid(ct_city)
 
     # find out which points fall in holc areas and their grades
-    unw_overlap <- over(unw_centr_pt, holc_sub)
+    unw_overlap <- st_intersection(unw_centr_pt, holc_sub)
 
     # now get the populations that overlap
-    total_coverage <- sapply(1:nrow(unw_overlap), function(x){
-      if (!is.na(unw_overlap$holc_id[x])){
-        tmp <- intersect(
+    total_coverage <- unlist(suppressMessages(sapply(1:nrow(unw_overlap), function(x){
+      if (!is.na(unw_overlap$label[x])){
+        tmp <- st_intersection(
           ct_city[x,],
-          holc_sub[holc_sub@data$neighborho == unw_overlap$neighborho[x],])
+          holc_sub[holc_sub$label == unw_overlap$label[x],])
 
 
         if (!is.null(tmp)){
           return(
-            area(tmp)/
-              area(holc_sub[holc_sub@data$neighborho == unw_overlap$neighborho[x],])*
-              all_pop[as.character(tmp@data$neighborho[1])])
+            st_area(tmp)/
+              st_area(holc_sub[holc_sub$label == unw_overlap$label[x],])*
+              all_pop[as.character(tmp$label[1])])
         } else {
           return(0)
         }
@@ -999,7 +974,8 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
       } else {
         return(0)
       }
-    })
+    })))
+    total_coverage <- total_coverage[!is.na(total_coverage)]
 
     if (!add_penalty){
       perc_coverage <- sum(total_coverage)/sum(all_pop)
@@ -1017,40 +993,28 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
         sum(penalty)/sum(intr_df$total_pop[penalty != 0])
     }
   } else if (cn == "w_centroid") {
-    # load the data
-    # centr_pop <- read.csv(
-    #   file.path(
-    #     data_folder,"CenPop2010_Means", paste0("CenPop2010_Mean_",st,".csv")
-    #   ),
-    #   colClasses = c(rep("character",3), rep("numeric",3))
-    # )
-    # centr_pop$GEOID <- paste0(
-    #   centr_pop$STATEFP,
-    #   centr_pop$COUNTYFP,
-    #   centr_pop$TRACTCE
-    # )
-    centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city@data$GEOID,]
+    centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city$GEOID,]
 
-    w_pts <- SpatialPoints(centr_pop_city[,c("LONGITUDE", "LATITUDE")],
-                           proj4string = ct@proj4string)
-    w_overlap <- over(w_pts, orig_holc_sub)
+    w_pts <- st_as_sf(centr_pop_city, coords = c("LONGITUDE", "LATITUDE"),
+                      crs = st_crs(ct), agr = "constant")
+    w_overlap <- st_intersection(w_pts, orig_holc_sub)
 
     # now get the areas that overlap
-    total_coverage <- sum(sapply(1:nrow(w_overlap), function(x){
-      if (!is.na(w_overlap$holc_id[x])){
-        tmp <- intersect(
-          ct_city[ct_city@data$GEOID == centr_pop_city$GEOID[x],],
-          holc_sub[holc_sub@data$neighborho == w_overlap$neighborho[x],]
+    total_coverage <- as.numeric(unlist(suppressMessages(sapply(1:nrow(w_overlap), function(x){
+      if (!is.na(w_overlap$label[x])){
+        tmp <- st_intersection(
+          ct_city[ct_city$GEOID == centr_pop_city$GEOID[x],],
+          holc_sub[holc_sub$label == w_overlap$label[x],]
         )
 
         return(
-          area(tmp)/
-            area(holc_sub[holc_sub@data$neighborho == w_overlap$neighborho[x],])*
-            all_pop[as.character(tmp@data$neighborho[1])])
+          st_area(tmp)/
+            st_area(holc_sub[holc_sub$label == w_overlap$label[x],])*
+            all_pop[as.character(tmp$label[1])])
       } else {
         return(0)
       }
-    }))
+    }))))
 
     if (!add_penalty){
       perc_coverage <- sum(total_coverage)/sum(all_pop)
