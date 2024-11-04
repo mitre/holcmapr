@@ -4,6 +4,8 @@
 
 holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the [Mapping Inequality website](https://dsl.richmond.edu/panorama/redlining/). For more information about these methods, please see our publication, [Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research](https://link.springer.com/article/10.1007/s11524-024-00841-3#citeas).
 
+Note that this package only includes cities that have been mapped to HOLC grades (A - D and E). Other cities with alternative mapping schemes (such as Arkadelphia, AK) are not included; however, the evaluated methodologies should still be considered. For more information about these cities, please see Mapping Inequality, linked above.
+
 If you use this package in your work, please cite us:
 
 De los Santos, H., Bezold, C.P., Jiang, K.M. et al. Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research. J Urban Health 101, 392–401 (2024). https://doi.org/10.1007/s11524-024-00841-3
