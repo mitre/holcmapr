@@ -15,7 +15,6 @@ source(file.path(system.file("R", package = "holcmapr"),
 library(tidycensus)
 library(sf)
 
-# FIGURE THIS OUT
 data_folder <- system.file("extdata", package = "holcmapr")
 assign("data_folder", data_folder, envir = topenv())
 
