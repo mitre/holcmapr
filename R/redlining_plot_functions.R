@@ -19,7 +19,7 @@ plot_HOLC_area <- function(city, st){
   hd_plot <- holc_sub
 
   ggplot()+
-    geom_sf(data = hd_plot, aes(fill = grade))+
+    geom_sf(data = hd_plot, aes(fill = grade), color = "black")+
     coord_sf(datum=st_crs(3857),
              xlim = st_bbox(holc_sub)[c(1,3)],
              ylim = st_bbox(holc_sub)[c(2,4)])+
@@ -53,7 +53,7 @@ plot_census_map_overlay <- function(city, st, ct){
 
   ggplot()+
     geom_sf(data = hd_plot, aes(fill = grade), color = NA, alpha = .7)+
-    geom_sf(data = ct_city, fill = NA, alpha = .7)+
+    geom_sf(data = ct_city, fill = NA, alpha = .7, color = "black")+
     scale_fill_manual("HOLC Grade", values = holc_colors)+
     theme_bw()+
     coord_sf( xlim = st_bbox(holc_sub)[c(1,3)],
@@ -177,7 +177,7 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
 
   if (add_opacity){
     p <- p +
-      geom_sf(data = ct_class, aes(fill =  .data[[cn]], alpha = frac_graded))+
+      geom_sf(data = ct_class, aes(fill =  .data[[cn]], alpha = frac_graded), color = "black")+
 
       # geom_polygon(data = ct_class,
       #              aes_string("long", "lat", group = "group", fill = cn,
@@ -190,7 +190,7 @@ plot_assignment <- function(city, st, ct, cn, intr_df,
   } else {
     p <- p +
       geom_sf(data = ct_class, aes(fill =  .data[[cn]]),
-                   alpha = .7)
+                   alpha = .7, color = "black")
   }
 
   p <- p +
@@ -711,7 +711,7 @@ plot_assignment_diff <- function(city, st, ct, cn1, cn2, intr_df){
   # plot classification by unweighted centroid
   p <- ggplot() +
     geom_sf(data = ct_class, aes(fill =  diff_cn),
-            alpha = .7)+
+            alpha = .7, color = "black")+
     # scale_fill_manual(values = holc_colors)+
     theme_bw()+
     coord_sf( xlim = st_bbox(holc_sub)[c(1,3)],

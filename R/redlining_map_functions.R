@@ -144,6 +144,9 @@ get_tigris_tract_info <- function(city, st){
 #' @keywords internal
 #' @noRd
 calc_census_area_pop <- function(city, st, ct, cb){
+  # fix degenerate edges
+  sf_use_s2(FALSE)
+
   holc_sub <- holc_dat[
     holc_dat$city == city & holc_dat$state == st &
       holc_dat$grade != "E"
@@ -257,6 +260,9 @@ calc_census_area_pop <- function(city, st, ct, cb){
 
   intr_df$total_area <- as.numeric(intr_df$total_area)
 
+  # reset degenerate edge fix
+  sf_use_s2(TRUE)
+
   return(intr_df)
 }
 
@@ -266,6 +272,9 @@ calc_census_area_pop <- function(city, st, ct, cb){
 #' @noRd
 test_assignment <- function(city, st, ct, cb,
                             in_methods, c_area_pop){
+  # fix degenerate edges
+  sf_use_s2(FALSE)
+
   # subset holc data to the city and state
   holc_sub <- holc_dat[
     holc_dat$city == city & holc_dat$state == st &
@@ -560,6 +569,9 @@ test_assignment <- function(city, st, ct, cb,
     }
 
   }
+  # reset degenerate edge fix
+  sf_use_s2(TRUE)
+
   return(intr_df)
 }
 
@@ -655,6 +667,9 @@ automatic_threshold <- function(intr_df, type = "area"){
 assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
                                       add_penalty = T, pen_wt = .5,
                                       add_opacity = F){
+  # fix degenerate edges
+  sf_use_s2(FALSE)
+
   if (cn %in% c("w_centroid", "unw_centroid", "crossney", "krieger", "ncrc",
                 "li", "lynch", "lane", "lee", "mujahid")){
     add_opacity <- F
@@ -707,7 +722,7 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
     total_coverage <-  unlist(suppressMessages(sapply(1:nrow(unw_overlap), function(x){
       if (!is.na(unw_overlap$label[x])){
         tmp <- st_intersection(
-          ct_city[x,],
+          ct_city[ct_city$GEOID == unw_overlap$GEOID[x],],
           holc_sub[holc_sub$label == unw_overlap$label[x],])
 
         if (!is.null(tmp)){
@@ -735,6 +750,7 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
         # penalty -- don't county tracts that weren't included
         sum(penalty)/sum(intr_df$total_area[penalty != 0])
     }
+
   } else if (cn == "w_centroid") {
     centr_pop_city <- centr_pop[centr_pop$GEOID %in% ct_city$GEOID,]
 
@@ -746,7 +762,7 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
     total_coverage <-  unlist(suppressMessages(sapply(1:nrow(w_overlap), function(x){
       if (!is.na(w_overlap$label[x])){
         tmp <- st_intersection(
-          ct_city[ct_city$GEOID == centr_pop_city$GEOID[x],],
+          ct_city[ct_city$GEOID == w_overlap$GEOID[x],],
           holc_sub[holc_sub$label == w_overlap$label[x],])
 
         return(st_area(tmp))
@@ -896,6 +912,10 @@ calc_holc_pop <- function(city, st, ct, cb){
 
   names(all_pop) <- holc_sub$label
 
+  # reset degenerate edge fix
+  sf_use_s2(TRUE)
+
+
   return(all_pop)
 }
 
@@ -907,6 +927,9 @@ calc_holc_pop <- function(city, st, ct, cb){
 assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
                                      add_penalty = T, pen_wt = .5,
                                      add_opacity = F){
+  # fix degenerate edges
+  sf_use_s2(FALSE)
+
   if (cn %in% c("w_centroid", "unw_centroid", "crossney", "krieger", "ncrc",
                 "li", "lynch", "lane", "lee", "mujahid")){
     add_opacity <- F
@@ -958,7 +981,7 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
     total_coverage <- unlist(suppressMessages(sapply(1:nrow(unw_overlap), function(x){
       if (!is.na(unw_overlap$label[x])){
         tmp <- st_intersection(
-          ct_city[x,],
+          ct_city[ct_city$GEOID == unw_overlap$GEOID[x],],
           holc_sub[holc_sub$label == unw_overlap$label[x],])
 
 
@@ -983,7 +1006,7 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
       # get the penalty
       rownames(intr_df) <- intr_df$GEOID
       penalty <-
-        intr_df[ct_city@data$GEOID, "not_graded_pop"] * pen_wt
+        intr_df[ct_city$GEOID, "not_graded_pop"] * pen_wt
       penalty[total_coverage == 0] <- 0
 
       perc_coverage <-
@@ -1003,7 +1026,7 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
     total_coverage <- as.numeric(unlist(suppressMessages(sapply(1:nrow(w_overlap), function(x){
       if (!is.na(w_overlap$label[x])){
         tmp <- st_intersection(
-          ct_city[ct_city$GEOID == centr_pop_city$GEOID[x],],
+          ct_city[ct_city$GEOID == w_overlap$GEOID[x],],
           holc_sub[holc_sub$label == w_overlap$label[x],]
         )
 
@@ -1082,6 +1105,8 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
         sum(penalty*wts)/sum(intr_df$total_pop[penalty != 0])
     }
   }
+  # reset degenerate edge fix
+  sf_use_s2(TRUE)
 
   return(perc_coverage)
 }
