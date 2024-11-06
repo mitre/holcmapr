@@ -6,12 +6,12 @@
 
 #' Function to run redlining mapping methodology comparison app.
 #'
-#' @import shiny broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable rgeos raster rgdal shinyBS
+#' @import broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable shinyBS
+#' @importFrom DT DTOutput renderDT
 #' @importFrom shinyWidgets materialSwitch
 #' @importFrom grid textGrob gpar
 #' @importFrom gridExtra grid.arrange
 #' @importFrom scales rescale
-#' @importFrom sp spTransform SpatialPoints over
 #' @importFrom utils combn write.csv
 #' @importFrom bsplus shiny_iconlink bs_embed_popover
 #' @export

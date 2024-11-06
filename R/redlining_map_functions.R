@@ -140,7 +140,6 @@ get_tigris_tract_info <- function(city, st){
 }
 
 #' function to get the area/pop of the census tracts (aiming for efficiency)
-#' @importFrom sp CRS
 #' @keywords internal
 #' @noRd
 calc_census_area_pop <- function(city, st, ct, cb){
@@ -267,7 +266,6 @@ calc_census_area_pop <- function(city, st, ct, cb){
 }
 
 #' function to generate tract assignments based on different methods
-#' @importFrom sp CRS
 #' @keywords internal
 #' @noRd
 test_assignment <- function(city, st, ct, cb,
@@ -661,7 +659,6 @@ automatic_threshold <- function(intr_df, type = "area"){
 
 #' assess percent of holc area represented for a given method (cn)
 #' include penalty for ungraded area
-#' @importFrom sp CRS
 #' @keywords internal
 #' @noRd
 assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
@@ -846,7 +843,6 @@ assess_holc_coverage_area <- function(city, st, ct, intr_df, cn,
 }
 
 #' calculate population in each holc polygon
-#' @importFrom sp CRS
 #' @keywords internal
 #' @noRd
 calc_holc_pop <- function(city, st, ct, cb){
@@ -921,7 +917,6 @@ calc_holc_pop <- function(city, st, ct, cb){
 
 #' assess percent of holc pop represented for a given method (cn)
 #'
-#' @importFrom sp CRS
 #' @keywords internal
 #' @noRd
 assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
