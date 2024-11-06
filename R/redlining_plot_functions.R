@@ -73,7 +73,7 @@ plot_census_map_overlay <- function(city, st, ct){
 #' @noRd
 plot_census_block_pop <- function(cb, city, st){
 
-  long <- lat <- group <- value <- NULL
+  long <- lat <- group <- value <- frac_graded <- ct <- grade <- NULL
   holc_sub <- holc_dat[
     holc_dat$city == city & holc_dat$state == st &
       holc_dat$grade != "E"
@@ -109,7 +109,7 @@ plot_census_block_pop <- function(cb, city, st){
 plot_assignment <- function(city, st, ct, cn, intr_df,
                             add_outcome = F, which_outcome = "le"){
   long <- lat <- group <- unw_centroid_long <- unw_centroid_lat <-
-    outcome <- NULL
+    outcome <- frac_graded <- NULL
 
   if (all(is.na(intr_df[,cn]))){
     return(ggplot()+theme_bw())

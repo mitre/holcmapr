@@ -53,5 +53,4 @@ Imports:
   colorspace,
   methods,
   shinyBS,
-  bsplus,
-  lwgeom
+  bsplus

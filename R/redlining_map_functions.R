@@ -625,6 +625,7 @@ get_width <- function(city, st, height){
 }
 
 #' function to figure out threshold based on density plot
+#' @importFrom stats density
 #' @keywords internal
 #' @noRd
 automatic_threshold <- function(intr_df, type = "area"){
@@ -885,7 +886,7 @@ calc_holc_pop <- function(city, st, ct, cb){
 
   all_pop <-
     # sapply
-    supressMessages(sapply(1:nrow(holc_sub), function(i){
+    suppressMessages(sapply(1:nrow(holc_sub), function(i){
       # only intersect with tracts where we know it will be
       holc_pop <- st_intersection(
         holc_sub[i,],
@@ -1108,7 +1109,7 @@ assess_holc_coverage_pop <- function(city, st, ct, cb, intr_df, all_pop, cn,
 
 #' function to calculate a linear model, returns the summary
 #' outcome: asthma, mental health, physical health, life expectancy
-#' @importFrom stats complete.cases lm
+#' @importFrom stats complete.cases lm predict
 #' @keywords internal
 #' @noRd
 run_lm <- function(cn, intr_df, outcome = "asthma", add_weights = F){

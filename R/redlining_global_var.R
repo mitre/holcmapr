@@ -12,8 +12,8 @@
   data_folder <- system.file("extdata", package = "holcmapr")
   assign("data_folder", data_folder, envir = topenv())
 
-  holc_dat <- sf::st_read(
-    file.path(data_folder, "mappinginequality.json"))
+  holc_dat <- suppressMessages(sf::st_read(
+    file.path(data_folder, "mappinginequality.json")))
   # only keep cities that have been graded by HOLC
   holc_dat <- holc_dat[!is.na(holc_dat$grade) & holc_dat$grade != "",]
   # label neighborhoods that have no labels
