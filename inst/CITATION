@@ -28,18 +28,18 @@ citEntry(
   entry    = "Misc",
   title    = "GeoNames Postal Code Files",
   author   = "GeoNames",
-  note     = "Accessed: 2022-11-28",
+  note     = "Accessed: 2024-11-1",
   url      = "https://download.geonames.org/export/zip/",
-  textVersion = "GeoNames (2022). GeoNames Postal Code Files. Accessed: 2022-11-28. <https://download.geonames.org/export/zip/>"
+  textVersion = "GeoNames (2024). GeoNames Postal Code Files. Accessed: 2024-11-1. <https://download.geonames.org/export/zip/>"
 )
 
 citEntry(
   entry    = "Misc",
-  title    = "Centers of Population (2010)",
+  title    = "Centers of Population (2020)",
   author   = "United States Census Bureau",
-  note     = "Accessed: 2022-11-28",
+  note     = "Accessed: 2024-11-1",
   url      = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html",
-  textVersion = "United States Census Bureau (2010). Centers of Population (2010). Accessed: 2022-11-28. <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html>"
+  textVersion = "United States Census Bureau (2020). Centers of Population (2020). Accessed: 2024-11-1. <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2020.html>"
 )
 
 citEntry(
@@ -59,9 +59,9 @@ citEntry(
   entry    = "Misc",
   title    = "PLACES",
   author   = "Centers for Disease Control and Prevention",
-  note     = "Accessed: 2022-11-28",
+  note     = "Accessed: 2024-11-1",
   url      = "https://www.cdc.gov/places",
   textVersion = paste(
-"PLACES. Centers for Disease Control and Prevention. Accessed 2022-11-28. https://www.cdc.gov/places"
+"PLACES. Centers for Disease Control and Prevention. Accessed 2024-11-1. https://www.cdc.gov/places"
   )
 )

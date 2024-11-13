@@ -77,27 +77,28 @@ citation("holcmapr")
 which outputs citations used in default format:
 
 ```
-  De los Santos, H., Bezold, C.P., Jiang, K.M. et al. Evaluating Methods for Mapping
-  Historical Redlining to Census Tracts for Health Equity Research. J Urban Health
-  101, 392–401 (2024). https://doi.org/10.1007/s11524-024-00841-3
+  De los Santos, H., Bezold, C.P., Jiang, K.M. et al. Evaluating Methods
+  for Mapping Historical Redlining to Census Tracts for Health Equity
+  Research. J Urban Health 101, 392–401 (2024).
+  https://doi.org/10.1007/s11524-024-00841-3
 
-  Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al.,
-  “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L.
-  Ayers, accessed November 28, 2022,
+  Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et
+  al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and
+  Edward L. Ayers, accessed November 28, 2022,
   https://dsl.richmond.edu/panorama/redlining/
 
-  GeoNames (2022). GeoNames Postal Code Files. Accessed: 2022-11-28.
+  GeoNames (2024). GeoNames Postal Code Files. Accessed: 2024-11-1.
   <https://download.geonames.org/export/zip/>
 
-  United States Census Bureau (2010). Centers of Population (2010). Accessed:
-  2022-11-28.
-  <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html>
+  United States Census Bureau (2020). Centers of Population (2020).
+  Accessed: 2024-11-1.
+  <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2020.html>
 
   Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J. U.S. Small-area Life
   Expectancy Estimates Project: Methodology and Results Summary. National
   Center for Health Statistics. Vital Health Stat 2(181). 2018.
 
-  PLACES. Centers for Disease Control and Prevention. Accessed 2022-11-28.
+  PLACES. Centers for Disease Control and Prevention. Accessed 2024-11-1.
   https://www.cdc.gov/places
 ```
 
@@ -106,7 +107,7 @@ Instructions for citations related to pieces of the package can be found in that
 The data sources used in this package are:
 - [Mapping Inequality](https://dsl.richmond.edu/panorama/redlining/): Redlining Spatial Files
 - [GeoNames Postal Code Files](https://download.geonames.org/export/zip/): Mapping cities to counties
-- [US Census Bureau Centers of Population (2010)](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html): Population centers for census tracts, for population-weighted centroid method
+- [US Census Bureau Centers of Population (2020)](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2020.html): Population centers for census tracts, for population-weighted centroid method
 - [USALEEP Life Expectancy](https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html): Life expectancy census tract estimates
 - [CDC Places](https://www.cdc.gov/places): Mental health and physical health census tract estimates
 
