@@ -2,9 +2,11 @@
 
 ## Overview
 
-holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the [Mapping Inequality website](https://dsl.richmond.edu/panorama/redlining/). For more information about these methods, please see our publication, [Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research](https://link.springer.com/article/10.1007/s11524-024-00841-3#citeas).
+holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day 2020 census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the [Mapping Inequality website](https://dsl.richmond.edu/panorama/redlining/). For more information about these methods, please see our publication, [Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research](https://link.springer.com/article/10.1007/s11524-024-00841-3#citeas).
 
-Note that this package only includes cities that have been mapped to HOLC grades (A - D and E). Other cities with alternative mapping schemes (such as Arkadelphia, AK) are not included; however, the evaluated methodologies should still be considered. For more information about these cities, please see Mapping Inequality, linked above.
+Note that this package only includes cities that have been mapped to HOLC grades (A - D and E). Other cities with alternative mapping schemes (such as Arkadelphia, AK) are not included; however, the evaluated methodologies should still be considered. For more information about these cities, please see Mapping Inequality, linked above. This uses the Mapping Inequality release version 3.2 as of August 26, 2024.
+
+Additionally, note that this uses 2020 census tracts for boundaries. For 2010 census tracts, please see [v0.0.1](https://github.com/mitre/holcmapr/releases/tag/v0.0.1).
 
 If you use this package in your work, please cite us:
 
