@@ -1,12 +1,15 @@
 citHeader("To cite holcmapr in publications use citations for package and Mapping Inequality. Additionally, if using population-weighted centroid-based methods, please cite, US Census Centers of Population. Additionally, if using life expectancy results, please cite USALEEP. Additionally, if using mental or physical health results, please cite CDC PLACES. Citations for these references appear below.")
 
 citEntry(
-  entry    = "Manual",
-  title    = "holcmapr: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) Redlining Maps",
-  author   = "Hannah De los Santos, Carla Bezold, Karen Jiang, Jarvis Chen, Cassandra Okechukwu",
-  year     = 2022,
-  note = "R package version 0.0.1",
-  textVersion = "De los Santos H, Bezold C, Jiang K, Chen J, Okechukwu C (2022). holcmapr: Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC) Redlining Maps. R package version 0.0.1."
+  entry    = "Article",
+  title    = "Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research",
+  author   = "Hannah De los Santos, Carla P. Bezold, Karen M. Jiang, Jarvis T. Chen, Cassandra A. Okechukwu",
+  year     = 2024,
+  journal = "Journal of Urban Health",
+  doi = "10.1007/s11524-024-00841-3",
+  volume = 101,
+  pages = "392-401",
+  textVersion = "De los Santos, H., Bezold, C.P., Jiang, K.M. et al. Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research. J Urban Health 101, 392–401 (2024). https://doi.org/10.1007/s11524-024-00841-3"
 )
 
 citEntry(
@@ -25,18 +28,18 @@ citEntry(
   entry    = "Misc",
   title    = "GeoNames Postal Code Files",
   author   = "GeoNames",
-  note     = "Accessed: 2022-11-28",
+  note     = "Accessed: 2024-11-1",
   url      = "https://download.geonames.org/export/zip/",
-  textVersion = "GeoNames (2022). GeoNames Postal Code Files. Accessed: 2022-11-28. <https://download.geonames.org/export/zip/>"
+  textVersion = "GeoNames (2024). GeoNames Postal Code Files. Accessed: 2024-11-1. <https://download.geonames.org/export/zip/>"
 )
 
 citEntry(
   entry    = "Misc",
-  title    = "Centers of Population (2010)",
+  title    = "Centers of Population (2020)",
   author   = "United States Census Bureau",
-  note     = "Accessed: 2022-11-28",
+  note     = "Accessed: 2024-11-1",
   url      = "https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html",
-  textVersion = "United States Census Bureau (2010). Centers of Population (2010). Accessed: 2022-11-28. <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html>"
+  textVersion = "United States Census Bureau (2020). Centers of Population (2020). Accessed: 2024-11-1. <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2020.html>"
 )
 
 citEntry(
@@ -56,9 +59,9 @@ citEntry(
   entry    = "Misc",
   title    = "PLACES",
   author   = "Centers for Disease Control and Prevention",
-  note     = "Accessed: 2022-11-28",
+  note     = "Accessed: 2024-11-1",
   url      = "https://www.cdc.gov/places",
   textVersion = paste(
-"PLACES. Centers for Disease Control and Prevention. Accessed 2022-11-28. https://www.cdc.gov/places"
+"PLACES. Centers for Disease Control and Prevention. Accessed 2024-11-1. https://www.cdc.gov/places"
   )
 )

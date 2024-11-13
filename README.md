@@ -2,7 +2,16 @@
 
 ## Overview
 
-holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the [Mapping Inequality website](https://dsl.richmond.edu/panorama/redlining/).
+holcmapr is an R package that provides a Shiny application for implementing and comparing methods of mapping Home Owners' Loan Corporation (HOLC) redlining map neighborhoods to present-day 2020 census tracts for all redlined cities. To learn more about redlining and look through the original HOLC maps, please see the [Mapping Inequality website](https://dsl.richmond.edu/panorama/redlining/). For more information about these methods, please see our publication, [Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research](https://link.springer.com/article/10.1007/s11524-024-00841-3#citeas).
+
+Note that this package only includes cities that have been mapped to HOLC grades (A - D and E). Other cities with alternative mapping schemes (such as Arkadelphia, AK) are not included; however, the evaluated methodologies should still be considered. For more information about these cities, please see Mapping Inequality, linked above. This uses the Mapping Inequality release version 3.2 as of August 26, 2024.
+
+Additionally, note that this uses 2020 census tracts for boundaries. For 2010 census tracts, please see [v0.0.1](https://github.com/mitre/holcmapr/releases/tag/v0.0.1).
+
+If you use this package in your work, please cite us:
+
+De los Santos, H., Bezold, C.P., Jiang, K.M. et al. Evaluating Methods for Mapping Historical Redlining to Census Tracts for Health Equity Research. J Urban Health 101, 392–401 (2024). https://doi.org/10.1007/s11524-024-00841-3
+
 
 ## Installation
 
@@ -68,27 +77,28 @@ citation("holcmapr")
 which outputs citations used in default format:
 
 ```
-  De los Santos H, Bezold C, Jiang K, Chen J, Okechukwu C (2022). holcmapr:
-  Compare Mapping Methodologies for Home Owners' Loan Corporation (HOLC)
-  Redlining Maps. R package version 0.0.1.
+  De los Santos, H., Bezold, C.P., Jiang, K.M. et al. Evaluating Methods
+  for Mapping Historical Redlining to Census Tracts for Health Equity
+  Research. J Urban Health 101, 392–401 (2024).
+  https://doi.org/10.1007/s11524-024-00841-3
 
-  Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et al.,
-  “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and Edward L.
-  Ayers, accessed November 28, 2022,
+  Robert K. Nelson, LaDale Winling, Richard Marciano, Nathan Connolly, et
+  al., “Mapping Inequality,” American Panorama, ed. Robert K. Nelson and
+  Edward L. Ayers, accessed November 28, 2022,
   https://dsl.richmond.edu/panorama/redlining/
 
-  GeoNames (2022). GeoNames Postal Code Files. Accessed: 2022-11-28.
+  GeoNames (2024). GeoNames Postal Code Files. Accessed: 2024-11-1.
   <https://download.geonames.org/export/zip/>
 
-  United States Census Bureau (2010). Centers of Population (2010). Accessed:
-  2022-11-28.
-  <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html>
+  United States Census Bureau (2020). Centers of Population (2020).
+  Accessed: 2024-11-1.
+  <https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2020.html>
 
   Arias E, Escobedo LA, Kennedy J, Fu C, Cisewski J. U.S. Small-area Life
   Expectancy Estimates Project: Methodology and Results Summary. National
   Center for Health Statistics. Vital Health Stat 2(181). 2018.
 
-  PLACES. Centers for Disease Control and Prevention. Accessed 2022-11-28.
+  PLACES. Centers for Disease Control and Prevention. Accessed 2024-11-1.
   https://www.cdc.gov/places
 ```
 
@@ -97,7 +107,7 @@ Instructions for citations related to pieces of the package can be found in that
 The data sources used in this package are:
 - [Mapping Inequality](https://dsl.richmond.edu/panorama/redlining/): Redlining Spatial Files
 - [GeoNames Postal Code Files](https://download.geonames.org/export/zip/): Mapping cities to counties
-- [US Census Bureau Centers of Population (2010)](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2010.html): Population centers for census tracts, for population-weighted centroid method
+- [US Census Bureau Centers of Population (2020)](https://www.census.gov/geographies/reference-files/time-series/geo/centers-population.2020.html): Population centers for census tracts, for population-weighted centroid method
 - [USALEEP Life Expectancy](https://www.cdc.gov/nchs/nvss/usaleep/usaleep.html): Life expectancy census tract estimates
 - [CDC Places](https://www.cdc.gov/places): Mental health and physical health census tract estimates
 
@@ -105,4 +115,4 @@ The data sources used in this package are:
 
 For any questions or concerns, please contact the maintainer for this package, Hannah De los Santos ([hdelossantos\@mitre.org](mailto:hdelossantos@mitre.org)).
 
-Approved for Public Release; Distribution Unlimited. Public Release Case Number 22-4028. ©2023 The MITRE Corporation. ALL RIGHTS RESERVED.
+Approved for Public Release; Distribution Unlimited. Public Release Case Number 22-4028. ©2024 The MITRE Corporation. ALL RIGHTS RESERVED.

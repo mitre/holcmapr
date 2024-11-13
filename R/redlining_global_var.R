@@ -12,17 +12,34 @@
   data_folder <- system.file("extdata", package = "holcmapr")
   assign("data_folder", data_folder, envir = topenv())
 
-  # load HOLC data -- much faster to load it from RData
-  # holc_dat <- readOGR(
-  #   file.path(data_folder, "Redlining", "redlining_fullshpfile", "HOLC_Cities.gdb"),
-  #   "holc_ad_data")
-  load(file.path(data_folder, "HOLC_shpfile.RData"))
+  holc_dat <- suppressMessages(sf::st_read(
+    file.path(data_folder, "mappinginequality.json")))
+  # only keep cities that have been graded by HOLC
+  holc_dat <- holc_dat[!is.na(holc_dat$grade) & holc_dat$grade != "",]
+  # label neighborhoods that have no labels
+  for (cts in unique(paste0(holc_dat$city, "/", holc_dat$state))){
+    city <- strsplit(cts, "/")[[1]][1]
+    st <- strsplit(cts, "/")[[1]][2]
+
+    holc_sub <- holc_dat[
+      holc_dat$city == city & holc_dat$state == st
+      ,]
+
+    if (any(" " %in% holc_sub$label)){
+      holc_sub$label[holc_sub$label == " "] <- paste0("ZZ", 1:sum(holc_sub$label == " "))
+    }
+
+    holc_dat[
+      holc_dat$city == city & holc_dat$state == st
+      , "label"] <- holc_sub$label
+
+  }
   # will result in holc_dat
   assign("holc_dat", holc_dat, envir = topenv())
 
 
   # load us cities data (for mapping to counties for easy census download)
-  us_cities <- read.csv(file.path(data_folder, "US_cities.csv"))
+  us_cities <- read.csv(file.path(data_folder, "All_US_cities.csv"))
   # also load specific city mappings
   specific_us_cities <- read.csv(file.path(data_folder, "Specific_US_cities.csv"))
 
@@ -32,7 +49,7 @@
   # load centroids
   centr_pop <- read.csv(
     file.path(
-      data_folder,"CenPop2010_Means", "CenPop2010_Mean_US.csv"
+      data_folder, "CenPop2020_Mean_TR.csv"
     ),
     colClasses = c(rep("character",3), rep("numeric",3))
   )
@@ -46,7 +63,7 @@
   # load PLACES data (for health outcome data)
   places_df <- read.csv(
     file.path(data_folder, "PLACES", "CT",
-              "PLACES__Census_Tract_Data__GIS_Friendly_Format___2020_release.csv"),
+              "PLACES__Census_Tract_Data__GIS_Friendly_Format___2024_release.csv"),
     colClasses = c("TractFIPS" = "character")
   )
   rownames(places_df) <- places_df$TractFIPS

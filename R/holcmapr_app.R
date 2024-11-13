@@ -6,12 +6,12 @@
 
 #' Function to run redlining mapping methodology comparison app.
 #'
-#' @import shiny broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable rgeos raster rgdal shinyBS
+#' @import broom ggplot2 tidycensus sf reshape2 tigris stringr rhandsontable shinyBS
+#' @importFrom DT DTOutput renderDT
 #' @importFrom shinyWidgets materialSwitch
 #' @importFrom grid textGrob gpar
 #' @importFrom gridExtra grid.arrange
 #' @importFrom scales rescale
-#' @importFrom sp spTransform SpatialPoints over
 #' @importFrom utils combn write.csv
 #' @importFrom bsplus shiny_iconlink bs_embed_popover
 #' @export
@@ -415,7 +415,7 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
                         title = "This summary table places all the high level statistics to answer these questions in one table. For more information, see \"How to Compare Methods\" on the About page."
                       ),
                       HTML("<p></p>"),
-                      dataTableOutput("city_stats")
+                      DT::DTOutput("city_stats")
                     )
                   )
                 )
@@ -636,10 +636,10 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
 
         # this gets the base HOLC assignments (no thresholds)
         intr_df$orig <- intr_df$thr <-
-          test_assignment(
+          suppressWarnings(suppressMessages(test_assignment(
             pretty_out$city, pretty_out$st, census$ct, census$cb,
             in_methods(), c_area_pop()
-          )
+          )))
 
         incProgress(amount = .2, message = "Adding thresholds")
 
@@ -661,8 +661,8 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
         incProgress(amount = .2, message = "Calculating city attributes")
 
         # calculate dominant percentage values
-        dom_perc_res <- calc_dom_perc(intr_df$thr, type = "exact")
-        dom_perc_class <- calc_dom_perc(intr_df$thr, type = "class")
+        dom_perc_res <- suppressWarnings(suppressMessages(calc_dom_perc(intr_df$thr, type = "exact")))
+        dom_perc_class <- suppressWarnings(suppressMessages(calc_dom_perc(intr_df$thr, type = "class")))
 
         city_attr$dom_perc_area <- dom_perc_res$area
         city_attr$dom_perc_pop <- dom_perc_res$pop
@@ -769,7 +769,7 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
     # plot city attributes ----
 
     # table of statistics
-    output$city_stats <- renderDataTable({
+    output$city_stats <- DT::renderDT({
       if (nrow(intr_df$thr) > 0){
         # calculate rmse
         pop_graded <-
@@ -819,33 +819,33 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
 
     # plot "exact" density plots
     output$dom_perc_area <- renderPlot({
-      plot_dom_perc_dens(city_attr$dom_perc_area, "Area")
+      suppressWarnings(suppressMessages(plot_dom_perc_dens(city_attr$dom_perc_area, "Area")))
     })
     output$dom_perc_pop <- renderPlot({
-      plot_dom_perc_dens(city_attr$dom_perc_pop, "Population")
+      suppressWarnings(suppressMessages(plot_dom_perc_dens(city_attr$dom_perc_pop, "Population")))
     })
 
     # plot "mixed class" bar plots
     output$dom_perc_area_class <- renderPlot({
-      plot_dom_perc_class(city_attr$dom_perc_area_class, "Area")
+      suppressWarnings(suppressMessages(plot_dom_perc_class(city_attr$dom_perc_area_class, "Area")))
     })
     output$dom_perc_pop_class <- renderPlot({
-      plot_dom_perc_class(city_attr$dom_perc_pop_class, "Population")
+      suppressWarnings(suppressMessages(plot_dom_perc_class(city_attr$dom_perc_pop_class, "Population")))
     })
 
     # plot area/pop distributions
 
     # plot the grading plot
     output$area_graded_dens <- renderPlot({
-      plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, T)
+      suppressWarnings(suppressMessages(plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, T)))
     })
 
     output$pop_graded_dens <- renderPlot({
-      plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, F)
+      suppressWarnings(suppressMessages( plot_graded_distributions(pretty_out$city, pretty_out$st, intr_df$thr, F)))
     })
 
     output$graded_scatter <- renderPlot({
-      plot_graded_scatter(pretty_out$city, pretty_out$st, intr_df$thr, T)
+      suppressWarnings(suppressMessages(plot_graded_scatter(pretty_out$city, pretty_out$st, intr_df$thr, T)))
     })
 
     # plot map comparison ----
@@ -853,7 +853,7 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
     # census area overlaid on HOLC grades
     output$census_holc_overlay <- output$city_overlay <- renderPlot({
       if (nrow(census$ct) > 0){
-        plot_census_map_overlay(pretty_out$city, pretty_out$st, census$ct)
+        suppressWarnings(suppressMessages(plot_census_map_overlay(pretty_out$city, pretty_out$st, census$ct)))
       } else {
         ggplot()
       }
@@ -866,11 +866,11 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
         output[[paste0("plot", my_pc)]] <- renderPlot({
           withProgress(message = "Plotting maps", detail = my_pc, {
             if (my_pc %in% in_methods()){
-              plot_assignment(
+              suppressWarnings(suppressMessages(plot_assignment(
                 pretty_out$city, pretty_out$st, census$ct, my_pc, intr_df$thr,
                 add_outcome = places_out$add_outcome,
                 which_outcome = places_out$which_outcome
-              )
+              )))
             } else {
               ggplot()+theme_bw()
             }
@@ -900,12 +900,12 @@ p('For any questions, comments, or suggestions, please contact the maintainer fo
 
     output$holc_coverage_curr_methods <- renderPlot({
       withProgress(message = "Making HOLC coverage plots for current methods", {
-        plot_holc_coverage(
+        suppressWarnings(suppressMessages(plot_holc_coverage(
           pretty_out$city, pretty_out$st,
           census$ct, census$cb, intr_df$thr,
           holc_pop(), in_methods(),
           penalty$add_penalty, penalty$pen_wt, add_opacity = map_opacity$incl
-        )
+        )))
       })
     })
 
