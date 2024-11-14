@@ -72,13 +72,12 @@ assign("centr_pop", centr_pop, envir = topenv())
 all_cities <- unique(paste0(holc_dat$city, "/", holc_dat$state))
 
 # before ~ 20 min
-all_cities <- all_cities[c(which(all_cities == "Hartford/CT"):length(all_cities))]
 # after: 4 hours
 # # also load the initial run
 # load(file.path(data_folder, "Redlining_Full_Preprocess_Info.RData"))
 
 start <- Sys.time()
-# redlining_info <- list()
+redlining_info <- list()
 for (cts in all_cities){
   print(paste0("[", Sys.time(), "] ", cts))
 
